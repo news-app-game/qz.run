@@ -6,12 +6,8 @@ import { toast } from "sonner"
 export function CopyButton({ text }: { text: string }) {
 
     const handleCopy = () => {
-        try {
-            navigator.clipboard.writeText(text);
-            toast.success("复制成功");
-        } catch (error) {
-            toast.error("复制失败");
-        }
+        navigator.clipboard.writeText(text);
+        toast.success("复制成功");
     };
 
     return (
