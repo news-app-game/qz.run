@@ -91,9 +91,9 @@ export default function Home() {
         </SectionHeader>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>什么是 VPN ？它有何帮助？</AccordionTrigger>
+            <AccordionTrigger>一个账号同时允许几个设备在线？</AccordionTrigger>
             <AccordionContent>
-              VPN 是 Virtual Private Network 的缩写，中文翻译为“虚拟私有网络”。它可以加密您的网络流量，保护您的隐私和安全。
+              3个
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
