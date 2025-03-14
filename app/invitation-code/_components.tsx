@@ -14,8 +14,13 @@ function InvitationCodeList({ codes }: { codes: string[] }) {
 }
 
 function InvitationCodeItem({ code }: { code: string }) {
+    const handleCopy = () => {
+        navigator.clipboard.writeText(code);
+        toast.success("邀请码已复制");
+    };
+
     return (
-        <Link href={`/signup?code=${code}`} onClick={() => toast.success("邀请码已复制")}>
+        <Link href={`/signup?code=${code}`} onClick={handleCopy}>
             <div className="flex items-center justify-center border rounded-md p-2 hover:bg-slate-100 hover:cursor-pointer">{code}</div>
         </Link>
     )
