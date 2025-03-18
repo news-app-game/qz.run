@@ -33,8 +33,11 @@ export function LoginForm({
                   />
                 </div>
                 <div className="grid gap-3">
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-between">
                     <Label htmlFor="password">密码</Label>
+                    <Link href="/reset-password">
+                      <div className="text-muted-foreground text-sm underline underline-offset-4">忘记密码?</div>
+                    </Link>
                   </div>
                   <Input id="password" type="password" required />
                 </div>
