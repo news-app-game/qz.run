@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +10,36 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import axios from "axios"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = (e.target as any).email.value;
+    const password = (e.target as any).password.value;
+    
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      email,
+      password
+    })
+    .then((response) => {
+      if(response.data.code === 200) {
+        localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.data.token}`;
+        window.location.href = '/';
+      }
+      console.log(response.data);
+    })
+    .catch((error) => {
+      console.error(error);
+    })
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -21,7 +47,7 @@ export function LoginForm({
           <CardTitle className="text-xl">登录轻舟</CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-3">
