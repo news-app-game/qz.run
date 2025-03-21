@@ -11,13 +11,21 @@ interface User {
   admin_role: number;
 }
 
-export default function Header() {
+export default function Header({ logined }: { logined: boolean }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!logined) {
+      console.log("Header1");
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    console.log("Header");
+    
     const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
@@ -30,7 +38,7 @@ export default function Header() {
     else{
         setLoading(false);
     }
-  }, []);
+  }, [logined]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

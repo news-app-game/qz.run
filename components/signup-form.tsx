@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 interface Configs {
   id: number;
@@ -137,6 +138,7 @@ export function SignupForm({
 
       if (data.code === 200) {
         // 注册成功，跳转到登录页
+        toast.success(data.message);
         router.push("/login");
       } else {
         setError(data.message || "注册失败");

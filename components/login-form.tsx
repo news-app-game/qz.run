@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import axios from "axios"
+import { toast } from "sonner";
 import { useRouter } from "next/navigation"
 
 export function LoginForm({
@@ -33,6 +34,7 @@ export function LoginForm({
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
         axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.data.token}`;
         window.location.href = '/';
+        toast.success(response.data.message);
       }
       console.log(response.data);
     })

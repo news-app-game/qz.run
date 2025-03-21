@@ -3,24 +3,21 @@
 import Link from "next/link";
 import { toast } from "sonner"
 
-function InvitationCodeList({ codes }: { codes: string[] }) {
+function InvitationCodeList({ codes }: { codes: Array<any> }) {
     return (
         <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {codes.map((code) => (
-                <InvitationCodeItem key={code} code={code} />
+                <InvitationCodeItem key={code?.code} code={code?.code} />
             ))}
         </div>
     )
 }
 
-function InvitationCodeItem({ code }: { code: string }) {
-    const handleCopy = () => {
-        navigator.clipboard.writeText(code);
-        toast.success("邀请码已复制");
-    };
+function InvitationCodeItem({ code }: { code: string}) {
+   
 
     return (
-        <Link href={`/signup?code=${code}`} onClick={handleCopy}>
+        <Link href={`/signup?code=${code}`}>
             <div className="flex items-center justify-center border rounded-md p-2 hover:bg-slate-100 hover:cursor-pointer">{code}</div>
         </Link>
     )
