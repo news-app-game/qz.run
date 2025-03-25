@@ -129,7 +129,6 @@ function ConfirmResetForm({ onResetSuccess, email }: { onResetSuccess: () => voi
 
         try {
             // TODO: 实现重置密码逻辑
-            console.log("重置密码", e.target.password.value)
             const code = (e.target as any).verificationCode.value
             const password = (e.target as any).password.value
             const passwordConfirm = (e.target as any).passwordConfirm.value
