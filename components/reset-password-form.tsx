@@ -14,25 +14,34 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import axios from "axios"
+import { toast } from "sonner";
 
-function SendEmailForm({ onEmailSent }: { onEmailSent: () => void }) {
+function SendEmailForm({ onEmailSent }: { onEmailSent: (email: string) => void }) {
     const [loading, setLoading] = useState(false)
 
     const handleSendEmail = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        const email = (e.target as any).email.value
+        if (!email) {
+            toast.error('请输入邮箱')
+            setLoading(false)
+            return
+        }
+
         setLoading(true)
 
         try {
             // TODO: 实现发送验证码逻辑
             console.log("发送验证码")
-            // 模拟发送验证码
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    setLoading(false)
-                    onEmailSent()
-                    resolve()
-                }, 1000)
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/send-verification-email`, {
+                email,
             })
+            if (res.data.code === 200) {
+                setLoading(false)
+                onEmailSent(email)
+            }
         } catch (error) {
             console.error(error)
             setLoading(false)
@@ -111,7 +120,7 @@ function ResetSuccess() {
     )
 }
 
-function ConfirmResetForm({ onResetSuccess }: { onResetSuccess: () => void }) {
+function ConfirmResetForm({ onResetSuccess, email }: { onResetSuccess: () => void, email: string }) {
     const [loading, setLoading] = useState(false)
 
     const handleConfirm = async (e: React.FormEvent) => {
@@ -120,15 +129,30 @@ function ConfirmResetForm({ onResetSuccess }: { onResetSuccess: () => void }) {
 
         try {
             // TODO: 实现重置密码逻辑
-            console.log("重置密码")
-            // 模拟重置密码
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    setLoading(false)
-                    onResetSuccess()
-                    resolve()
-                }, 1000)
+            console.log("重置密码", e.target.password.value)
+            const code = (e.target as any).verificationCode.value
+            const password = (e.target as any).password.value
+            const passwordConfirm = (e.target as any).passwordConfirm.value
+
+            if (!code || !password || !passwordConfirm) {
+                toast.error('请输入验证码、密码和确认密码')
+                setLoading(false)
+                return
+            }
+            if (password !== passwordConfirm) {
+                toast.error('密码和确认密码不一致')
+                setLoading(false)
+                return
+            }
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-email-password`, {
+                email: email,
+                code: code,
+                password: password,
             })
+            if (res.data.code === 200) {
+                setLoading(false)
+                onResetSuccess()
+            }
         } catch (error) {
             console.error(error)
             setLoading(false)
@@ -146,9 +170,9 @@ function ConfirmResetForm({ onResetSuccess }: { onResetSuccess: () => void }) {
                     <div className="grid gap-6">
                         <div className="grid gap-6">
                             <div className="grid gap-3">
-                                <Label htmlFor="verification-code">验证码</Label>
+                                <Label htmlFor="verificationCode">验证码</Label>
                                 <Input
-                                    id="verification-code"
+                                    id="verificationCode"
                                     type="text"
                                     placeholder="请输入验证码"
                                     required
@@ -159,8 +183,8 @@ function ConfirmResetForm({ onResetSuccess }: { onResetSuccess: () => void }) {
                                 <Input id="password" type="password" required />
                             </div>
                             <div className="grid gap-3">
-                                <Label htmlFor="password-confirm">确认新密码</Label>
-                                <Input id="password-confirm" type="password" required />
+                                <Label htmlFor="passwordConfirm">确认新密码</Label>
+                                <Input id="passwordConfirm" type="password" required />
                             </div>
                             <div className="flex items-center justify-between">
                                 <Button type="submit" className="w-full" disabled={loading}>
@@ -181,15 +205,20 @@ export function ResetPasswordForm({
 }: React.ComponentProps<"div">) {
     const [emailSent, setEmailSent] = useState(false)
     const [resetSuccess, setResetSuccess] = useState(false)
+    const [email, setEmail] = useState('')
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             {resetSuccess ? (
                 <ResetSuccess />
             ) : emailSent ? (
-                <ConfirmResetForm onResetSuccess={() => setResetSuccess(true)} />
+                <ConfirmResetForm onResetSuccess={() => setResetSuccess(true)} email={email} />
             ) : (
-                <SendEmailForm onEmailSent={() => setEmailSent(true)} />
+                <SendEmailForm onEmailSent={(email) => {
+                    setEmailSent(true)
+                    setEmail(email)
+                }
+                } />
             )}
         </div>
     )
