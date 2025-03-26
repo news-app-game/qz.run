@@ -5,5 +5,6 @@ export const feedback = async (data: Feedback.Params): Promise<Feedback.Res> => 
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 0,
   });
 };
