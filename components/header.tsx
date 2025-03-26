@@ -114,6 +114,13 @@ export default function Header({ logined }: { logined: boolean }) {
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
+                      <Link
+                        href="/admin"
+                      >
+                        管理后台
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
                       <Link href="/invite-records">邀请记录</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>

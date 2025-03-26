@@ -29,6 +29,7 @@ export function LoginForm({
       password
     })
       .then(({ code, data, message }) => {
+        console.log('login', code, data, message);
         if (code === 200) {
           refreshInstance.setToken(data.token);
           setUser(data.user);
