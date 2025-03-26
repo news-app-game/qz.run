@@ -18,12 +18,19 @@ export default function InvitationCode() {
   const [error, setError] = useState("");
   const fetchInviteCodes = async () => {
     setIsLoading(true);
-    const { code, data, message } = await getInviteCode()
-    if (code === 200) {
-      setInviteCodes(data.inviteCodes);
-      setDailyLimit(data.dailyLimit);
-    } else {
-      setError(message || "获取邀请码失败");
+    try {
+      const { code, data, message } = await getInviteCode()
+      if (code === 200) {
+        setInviteCodes(data.inviteCodes);
+        setDailyLimit(data.dailyLimit);
+      } else {
+        setError(message || "获取邀请码失败");
+      }
+    } catch (error) {
+      console.error(error);
+      setError("获取邀请码失败");
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
