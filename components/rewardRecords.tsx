@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getToken } from "@/tools/auth";
+import { refreshInstance } from "@/tools/refresh-instance";
 import { getRewardRecords } from "@/api/reward";
 export default function RewardRecords() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function RewardRecords() {
 
   const fetchRewardRecords = async () => {
     try {
-      const token = getToken();
+      const token = await refreshInstance.getToken();
       if (!token) {
         router.push("/login");
         return;

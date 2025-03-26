@@ -6,7 +6,7 @@ import Main from "@/components/main";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getToken } from "@/tools/auth";
+import { refreshInstance } from "@/tools/refresh-instance";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -15,13 +15,16 @@ export default function RootLayout({
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      setIsLogin(true);
-    } else {
-      router.push("/login");
-      setIsLogin(false);
-    }
+    const checkLogin = async () => {
+      const token = await refreshInstance.getToken();
+      if (token) {
+        setIsLogin(true);
+      } else {
+        router.push("/login");
+        setIsLogin(false);
+      }
+    };
+    checkLogin();
   }, []);
 
 

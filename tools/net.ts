@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { isServer } from '@/tools/check';
-import { getToken } from '@/tools/auth';
+import { isClient } from '@/tools/check';
+import { refreshInstance } from './refresh-instance';
+
 // 创建axios实例
 const instance: AxiosInstance = axios.create({
   // 设置基础URL，建议从环境变量获取
@@ -60,8 +61,8 @@ instance.interceptors.request.use(
     }
 
     // 如果不是服务器，则直接从 cookie 获取 token
-    if (!isServer) {
-      const token = getToken();
+    if (isClient) {
+      const token = await refreshInstance.getToken();
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -93,12 +94,9 @@ instance.interceptors.response.use(
       // 对响应错误做点什么
       switch (error.response.status) {
         case 401:
-          // 未授权，跳转到登录页
-          alert('未授权，跳转到登录页');
-          // window.location.href = '/login';
-          // if (!isServer) {
-          //   store?.accountStore.logout();
-          // }
+          if (isClient) {
+            refreshInstance.logout();
+          }
           break;
         case 403:
           // 权限不足

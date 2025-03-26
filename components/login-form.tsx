@@ -12,7 +12,9 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { toast } from "sonner";
 import { login } from "@/api/user";
-import { setUser, setToken } from "@/tools/auth";
+import { setUser } from "@/tools/auth";
+import { refreshInstance } from '@/tools/refresh-instance';
+
 export function LoginForm({
   className,
   ...props
@@ -28,7 +30,7 @@ export function LoginForm({
     })
       .then(({ code, data, message }) => {
         if (code === 200) {
-          setToken(data.token);
+          refreshInstance.setToken(data.token);
           setUser(data.user);
           window.location.href = '/';
           toast.success(message);

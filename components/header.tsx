@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { getUser } from "@/tools/auth";
+import { refreshInstance } from "@/tools/refresh-instance";
 interface User {
   email: string;
   admin_role: number;
@@ -49,8 +50,7 @@ export default function Header({ logined }: { logined: boolean }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    refreshInstance.logout();
     setUser(null);
     window.location.reload();
   };
