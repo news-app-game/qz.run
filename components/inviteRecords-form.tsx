@@ -2,13 +2,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getUserInviteRecords } from "@/api/user";
-import useUser from "@/hooks/useUser";
+import { getUser } from "@/tools/auth";
 
 export default function InviteRecords() {
   const [records, setRecords] = useState<User.InviteRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { getUser } = useUser();
   const [user, setUser] = useState<User.User | null>(null);
 
   useEffect(() => {

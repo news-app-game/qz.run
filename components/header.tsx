@@ -5,14 +5,13 @@ import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import useUser from "@/hooks/useUser";
+import { getUser } from "@/tools/auth";
 interface User {
   email: string;
   admin_role: number;
 }
 
 export default function Header({ logined }: { logined: boolean }) {
-  const { getUser } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);

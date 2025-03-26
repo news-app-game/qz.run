@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { isServer } from '@/tools/check';
-import { getCookie } from 'cookies-next';
+import { getToken } from '@/tools/auth';
 // 创建axios实例
 const instance: AxiosInstance = axios.create({
   // 设置基础URL，建议从环境变量获取
@@ -47,7 +47,6 @@ const tokenLoading = {
   },
 };
 
-
 // 请求拦截器
 instance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
@@ -62,7 +61,7 @@ instance.interceptors.request.use(
 
     // 如果不是服务器，则直接从 cookie 获取 token
     if (!isServer) {
-      const token = getCookie('token');
+      const token = getToken();
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }

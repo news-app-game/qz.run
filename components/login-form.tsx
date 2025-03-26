@@ -12,12 +12,11 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { toast } from "sonner";
 import { login } from "@/api/user";
-import useUser from "@/hooks/useUser";
+import { setUser, setToken } from "@/tools/auth";
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { setUser, setToken } = useUser();
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const email = (e.target as any).email.value;

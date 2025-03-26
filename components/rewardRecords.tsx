@@ -1,14 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useUser from "@/hooks/useUser";
+import { getToken } from "@/tools/auth";
 import { getRewardRecords } from "@/api/reward";
 export default function RewardRecords() {
   const router = useRouter();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { getToken } = useUser();
   useEffect(() => {
     fetchRewardRecords();
   }, []);

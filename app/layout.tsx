@@ -6,13 +6,12 @@ import Main from "@/components/main";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useUser from "@/hooks/useUser";
+import { getToken } from "@/tools/auth";
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { getToken } = useUser();
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
