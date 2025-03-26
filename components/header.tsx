@@ -7,6 +7,15 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { getUser } from "@/tools/auth";
 import { refreshInstance } from "@/tools/refresh-instance";
+import { CaretDown } from "@phosphor-icons/react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 interface User {
   email: string;
   admin_role: number;
@@ -55,7 +64,7 @@ export default function Header({ logined }: { logined: boolean }) {
     window.location.reload();
   };
   return (
-    <header className="sticky top-0 bg-white border-b z-[1000]">
+    <header className="sticky top-0 bg-white border-b">
       <div className="max-w-[1024px] mx-auto px-6 h-16 flex">
         <Link href="/" className="flex-1 flex items-center gap-3 lg:mr-6">
           <Image src="/logo.png" alt="logo" width={32} className="select-none" height={32} />
@@ -63,6 +72,7 @@ export default function Header({ logined }: { logined: boolean }) {
             {siteConfig.name}
           </span>
         </Link>
+
 
         {/* 备用不删 */}
         {/* <NavigationMenu> 
@@ -94,66 +104,28 @@ export default function Header({ logined }: { logined: boolean }) {
         <div className="flex-1 flex items-center justify-end gap-2">
           {!loading &&
             (user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center text-gray-600 hover:text-primary transition-colors cursor-pointer px-3 py-2"
-                >
-                  <span className="text-sm">{user.email}</span>
-                  <svg
-                    className={`h-4 w-4 ml-1 transition-transform ${showDropdown ? "rotate-180" : ""
-                      }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {showDropdown && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute right-4 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-                  >
-                    <div className="py-1" role="menu">
-                      <Link
-                        href="/invite-records"
-                        onClick={() => setShowDropdown(false)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                      >
-                        邀请记录
-                      </Link>
-
-                      <Link
-                        href="/reward-records"
-                        onClick={() => setShowDropdown(false)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                      >
-                        奖励记录
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          console.log(e);
-                          handleLogout();
-                          setShowDropdown(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                      >
-                        退出登录
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {user.email}
+                    <CaretDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <Link href="/invite-records">邀请记录</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href="/reward-records">奖励记录</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link href="" onClick={handleLogout}>退出登录</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Link href="/login">

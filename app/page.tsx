@@ -133,29 +133,9 @@ export default function Home() {
     };
 
     return (
-      <a
-        href={href}
-        onClick={handleClick}
-        className="bg-[#3B82F6] text-white px-8 py-2 rounded-t-lg font-medium hover:bg-[#2563EB] transition-all duration-300 flex items-center gap-2 group-hover:rounded-b-none"
-      >
-        <SystemIcon />
-        <span>立即下载</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`h-4 w-4 ml-1 transition-transform duration-200 ${isDownloadMenuOpen ? "rotate-180" : ""
-            }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </a>
+      <Link href="#download">
+        <Button className="md:w-auto" size="lg">下载客户端</Button>
+      </Link>
     );
   };
   return (
@@ -174,9 +154,9 @@ export default function Home() {
             <div className="w-full flex justify-center md:justify-start gap-3">
               <div
                 className="relative group cursor-pointer z-20"
-                onClick={() => setIsDownloadMenuOpen(!isDownloadMenuOpen)}
-                onMouseEnter={() => setIsDownloadMenuOpen(true)}
-                onMouseLeave={() => setIsDownloadMenuOpen(false)}
+              // onClick={() => setIsDownloadMenuOpen(!isDownloadMenuOpen)}
+              // onMouseEnter={() => setIsDownloadMenuOpen(true)}
+              // onMouseLeave={() => setIsDownloadMenuOpen(false)}
               >
                 <DownloadButton />
                 {isDownloadMenuOpen && (
