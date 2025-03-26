@@ -1,44 +1,32 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-
+import useUser from "@/hooks/useUser";
+import { getRewardRecords } from "@/api/reward";
 export default function RewardRecords() {
   const router = useRouter();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const { getToken } = useUser();
   useEffect(() => {
     fetchRewardRecords();
   }, []);
 
   const fetchRewardRecords = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       if (!token) {
         router.push("/login");
         return;
       }
 
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/user/reward-records`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        })
-        .then((response) => {
-          if (response.data.code === 200) {
-            setRecords(response.data.data);
-          } else {
-            setError(response.data.message || "获取奖励记录失败");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          setError("获取奖励记录失败，请检查网络连接");
-        });
+      const { code, data, message } = await getRewardRecords()
+      if (code === 200) {
+        setRecords(data);
+      } else {
+        setError(message || "获取奖励记录失败");
+      }
     } catch (error) {
       console.log(error);
       setError("获取奖励记录失败，请检查网络连接");
@@ -110,7 +98,7 @@ export default function RewardRecords() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {records.map((record: any , index) => (
+                    {records.map((record: any, index) => (
                       <tr key={index}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.type_name}

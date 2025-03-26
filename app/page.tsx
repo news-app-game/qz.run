@@ -32,13 +32,9 @@ export default function Home() {
   const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
   const [versions, setVersions] = useState<VersionData | null>(null);
   const [system, setSystem] = useState<OperatingSystem>("Unknown");
-  // const [arch, setArch] = useState<Architecture>('Unknown');
-  // const [error, setError] = useState('');
-
   const detectOSAndArch = async () => {
     const { os } = await detectOSAndArchitecture();
     setSystem(os);
-    // setArch(architecture)
   };
 
   useEffect(() => {
@@ -109,22 +105,6 @@ export default function Home() {
     }
   };
 
-  // const DownloadText = () => {
-  //   if (system === "Windows") {
-  //     return <span>下载 Windows (x64) 版</span>;
-  //   }
-  //   if (system === "MacOS") {
-  //     return <span>下载 MacOS (Intel) 版</span>;
-  //   }
-  //   if (system === "Android") {
-  //     return <span>下载 Android 手机版</span>;
-  //   }
-  //   if (system === "iOS") {
-  //     return <span>下载 iOS 手机版</span>;
-  //   }
-  //   return <span>下载 不同平台 版</span>;
-  // };
-
   const DownloadButton = () => {
     let href: string | undefined;
     const baseURL = "https://qz.run/download/";
@@ -162,9 +142,8 @@ export default function Home() {
         <span>立即下载</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={`h-4 w-4 ml-1 transition-transform duration-200 ${
-            isDownloadMenuOpen ? "rotate-180" : ""
-          }`}
+          className={`h-4 w-4 ml-1 transition-transform duration-200 ${isDownloadMenuOpen ? "rotate-180" : ""
+            }`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -204,9 +183,8 @@ export default function Home() {
                   <div className="absolute left-0 right-0 mt-0">
                     <div className="bg-white rounded-b-lg shadow-xl border border-gray-100 overflow-hidden">
                       <a
-                        href={`https://qz.run/download/${
-                          versions?.["windows-x64"]?.download_url ?? ""
-                        }`}
+                        href={`https://qz.run/download/${versions?.["windows-x64"]?.download_url ?? ""
+                          }`}
                         target="_blank"
                         className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
                       >
@@ -214,9 +192,8 @@ export default function Home() {
                         Windows(x64)
                       </a>
                       <a
-                        href={`https://qz.run/download/${
-                          versions?.["macos-arm64"]?.download_url ?? ""
-                        }`}
+                        href={`https://qz.run/download/${versions?.["macos-arm64"]?.download_url ?? ""
+                          }`}
                         target="_blank"
                         className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
                       >
@@ -224,9 +201,8 @@ export default function Home() {
                         MacOS (ARM64)
                       </a>
                       <a
-                        href={`https://qz.run/download/${
-                          versions?.["macos-x64"]?.download_url ?? ""
-                        }`}
+                        href={`https://qz.run/download/${versions?.["macos-x64"]?.download_url ?? ""
+                          }`}
                         target="_blank"
                         className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
                       >
@@ -234,9 +210,8 @@ export default function Home() {
                         MacOS (Intel)
                       </a>
                       <a
-                        href={`https://qz.run/download/${
-                          versions?.["android"]?.download_url ?? ""
-                        }`}
+                        href={`https://qz.run/download/${versions?.["android"]?.download_url ?? ""
+                          }`}
                         target="_blank"
                         className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
                       >
@@ -399,8 +374,7 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   window.open(
-                    `https://qz.run/download/${
-                      versions?.["android"]?.download_url ?? ""
+                    `https://qz.run/download/${versions?.["android"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -423,8 +397,7 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   window.open(
-                    `https://qz.run/download/${
-                      versions?.["ios"]?.download_url ?? ""
+                    `https://qz.run/download/${versions?.["ios"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -445,8 +418,7 @@ export default function Home() {
               <div className="w-full flex flex-col gap-3">
                 <Button className="w-full" variant="outline" onClick={() => {
                   window.open(
-                    `https://qz.run/download/${
-                      versions?.["macos-x64"]?.download_url ?? ""
+                    `https://qz.run/download/${versions?.["macos-x64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -455,8 +427,7 @@ export default function Home() {
                 </Button>
                 <Button className="w-full" variant="outline" onClick={() => {
                   window.open(
-                    `https://qz.run/download/${
-                      versions?.["macos-arm64"]?.download_url ?? ""
+                    `https://qz.run/download/${versions?.["macos-arm64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -485,8 +456,7 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   window.open(
-                    `https://qz.run/download/${
-                      versions?.["windows-x64"]?.download_url ?? ""
+                    `https://qz.run/download/${versions?.["windows-x64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );

@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -75,7 +74,7 @@ export function SignupForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     // 表单验证
     if (!inviteCodeDisabled && !formData.inviteCode) {
       setError("请输入邀请码");

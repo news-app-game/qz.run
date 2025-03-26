@@ -5,13 +5,14 @@ import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-
+import useUser from "@/hooks/useUser";
 interface User {
   email: string;
   admin_role: number;
 }
 
 export default function Header({ logined }: { logined: boolean }) {
+  const { getUser } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -19,24 +20,16 @@ export default function Header({ logined }: { logined: boolean }) {
 
   useEffect(() => {
     if (!logined) {
-      console.log("Header1");
       setUser(null);
       setLoading(false);
       return;
     }
-    console.log("Header");
-    
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        setUser(JSON.parse(userStr));
-        setLoading(false);
-      } catch (e) {
-        console.error("Failed to parse user info", e);
-      }
-    }
-    else{
-        setLoading(false);
+    const user = getUser();
+    if (user) {
+      setUser(user);
+      setLoading(false);
+    } else {
+      setLoading(false);
     }
   }, [logined]);
 
@@ -109,9 +102,8 @@ export default function Header({ logined }: { logined: boolean }) {
                 >
                   <span className="text-sm">{user.email}</span>
                   <svg
-                    className={`h-4 w-4 ml-1 transition-transform ${
-                      showDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`h-4 w-4 ml-1 transition-transform ${showDropdown ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

@@ -10,37 +10,34 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import axios from "axios"
 import { toast } from "sonner";
-import { useRouter } from "next/navigation"
-
+import { login } from "@/api/user";
+import useUser from "@/hooks/useUser";
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
+  const { setUser, setToken } = useUser();
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const email = (e.target as any).email.value;
     const password = (e.target as any).password.value;
-    
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+
+    login({
       email,
       password
     })
-    .then((response) => {
-      if(response.data.code === 200) {
-        localStorage.setItem("token", response.data.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.data.user));
-        axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.data.token}`;
-        window.location.href = '/';
-        toast.success(response.data.message);
-      }
-      console.log(response.data);
-    })
-    .catch((error) => {
-      console.error(error);
-    })
+      .then(({ code, data, message }) => {
+        if (code === 200) {
+          setToken(data.token);
+          setUser(data.user);
+          window.location.href = '/';
+          toast.success(message);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      })
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

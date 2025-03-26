@@ -1,4 +1,3 @@
-import InviteRecord from "@/components/inviteRecords-form";
 import RewardRecords from "@/components/rewardRecords";
 
 export default function InviteRecords() {

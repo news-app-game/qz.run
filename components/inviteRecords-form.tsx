@@ -1,68 +1,38 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import { toast } from "sonner";
-
-interface InviteRecord {
-  id: number;
-  inviter_id: number;
-  invitee_id: number;
-  invitee: string | null;
-  status: string | null;
-  created_at: string;
-}
-
-interface User {
-  id: number;
-  email: string;
-  invite_code: string;
-  created_at: string;
-}
+import { getUserInviteRecords } from "@/api/user";
+import useUser from "@/hooks/useUser";
 
 export default function InviteRecords() {
-  const router = useRouter();
-  const [records, setRecords] = useState<InviteRecord[]>([]);
+  const [records, setRecords] = useState<User.InviteRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const { getUser } = useUser();
+  const [user, setUser] = useState<User.User | null>(null);
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      setUser(JSON.parse(userStr));
+    const user = getUser();
+    if (user) {
+      setUser(user);
     }
     fetchInviteRecords();
   }, []);
 
   const fetchInviteRecords = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
+      const { code, data, message } = await getUserInviteRecords()
+      if (code === 200) {
+        setRecords(data);
+        return
+      } else {
+        setError(message || "获取邀请记录失败");
       }
-
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/user/invite-records`)
-        .then((response) => {
-          const data = response.data;
-          if (data.code === 200) {
-            setRecords(data.data);
-          } else {
-            setError(data.message || "获取邀请记录失败");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setError("获取邀请记录失败，请检查网络连接");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
     } catch (error) {
       console.log(error);
       setError("获取邀请记录失败，请检查网络连接");
+      setLoading(false);
+    } finally {
       setLoading(false);
     }
   };

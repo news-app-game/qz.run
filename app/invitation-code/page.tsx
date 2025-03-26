@@ -8,33 +8,7 @@ import {
 } from "@/components/ui/card";
 import { InvitationCodeList } from "./_components";
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-async function getInvitationCodes() {
-  const codes = [
-    "67D1AF80AFB0A",
-    "67D1AF80AFB1A",
-    "67D1AF80AFB2A",
-    "67D1AF80AFB3A",
-    "67D1AF80AFB4A",
-    "67D1AF80AFB5A",
-    "67D1AF80AFB6A",
-    "67D1AF80AFB7A",
-    "67D1AF80AFB8A",
-    "67D1AF80AFB9A",
-    "67D1AF80AFBAA",
-    "67D1AF80AFBBA",
-    "67D1AF80AFBCA",
-    "67D1AF80AFBDA",
-    "67D1AF80AFBEA",
-    "67D1AF80AFBFA",
-    "67D1AF80AFBGA",
-    "67D1AF80AFBHA",
-    "67D1AF80AFBIA",
-  ];
-
-  return codes;
-}
+import { getInviteCode } from "@/api/inviteCode";
 
 export default function InvitationCode() {
   const [inviteCodes, setInviteCodes] = useState([]);
@@ -42,20 +16,15 @@ export default function InvitationCode() {
   const [dailyLimit, setDailyLimit] = useState(0);
 
   const [error, setError] = useState("");
-  const fetchInviteCodes = () => {
+  const fetchInviteCodes = async () => {
     setIsLoading(true);
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/invite-code`)
-      .then((result) => {
-        setInviteCodes(result.data.data.inviteCodes);
-        setDailyLimit(result.data.data.dailyLimit);
-      })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "获取邀请码失败");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    const { code, data, message } = await getInviteCode()
+    if (code === 200) {
+      setInviteCodes(data.inviteCodes);
+      setDailyLimit(data.dailyLimit);
+    } else {
+      setError(message || "获取邀请码失败");
+    }
   };
   useEffect(() => {
     fetchInviteCodes();
@@ -79,7 +48,7 @@ export default function InvitationCode() {
             <div className="text-center text-red-500 py-8">{error}</div>
           ) : (
             <CardContent>
-              <InvitationCodeList codes={inviteCodes||[]} />
+              <InvitationCodeList codes={inviteCodes || []} />
             </CardContent>
           )}
         </Card>

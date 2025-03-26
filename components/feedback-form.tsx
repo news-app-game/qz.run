@@ -6,21 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
 import { toast } from "sonner";
-
+import { feedback } from "@/api/feedback";
 export function FeedbackForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle form submission
-    console.log((e.target as any).email.value);
-    console.log((e.target as any).version.value);
-    console.log((e.target as any).platform.value);
-    // console.log((e.target as any).feedbackContent.value);
-    console.log((e.target as any).screenshot.files);
     try {
       const formData = new FormData();
       formData.append("email", (e.target as any).email.value);
@@ -31,21 +24,12 @@ export function FeedbackForm({
       for (let i = 0; i < images.length; i++) {
         formData.append('images[]', images[i]);
       }
-      axios
-        .post(`${process.env.NEXT_PUBLIC_API_URL}/feedback`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          toast.success(response.data.message);
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("提交失败");
-        });
+      const { code, message } = await feedback(formData)
+      if (code === 200) {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
     } catch (error) {
       console.error(error);
       toast.error("提交失败");
