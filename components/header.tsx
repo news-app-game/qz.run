@@ -113,13 +113,17 @@ export default function Header({ logined }: { logined: boolean }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <Link
-                        href="/admin"
-                      >
-                        管理后台
-                      </Link>
-                    </DropdownMenuItem>
+                    {
+                      user.admin_role === 1 && (
+                        <DropdownMenuItem>
+                          <Link
+                            href="/admin"
+                          >
+                            管理后台
+                          </Link>
+                        </DropdownMenuItem>
+                      )
+                    }
                     <DropdownMenuItem>
                       <Link href="/invite-records">邀请记录</Link>
                     </DropdownMenuItem>
