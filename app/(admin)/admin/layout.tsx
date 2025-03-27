@@ -9,6 +9,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Image from "next/image";
 import { ArrowLeft, Bell, Gift, History, Home, HelpCircle, LucideProps, Network, Ticket, UserPlus, Users, Cog, MapPinned, Link2Icon } from 'lucide-react';
 import Link from 'next/link';
 import * as react from "react";
@@ -147,7 +148,9 @@ export default function AdminLayout({
         <div className="flex-1 flex flex-col overflow-hidden">
           <header className="h-16 border-b bg-card">
             <div className="h-full px-6 flex items-center justify-between">
-              {/* <SidebarTrigger /> */}
+              <Link href="/" className="flex-1 flex items-center gap-3 lg:mr-6 md:hidden">
+                <Image src="/logo.png" alt="logo" width={32} className="select-none" height={32} />
+              </Link>
               <h2 className="text-lg font-medium"></h2>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/" className="flex items-center space-x-2">
