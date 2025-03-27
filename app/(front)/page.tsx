@@ -153,7 +153,7 @@ export default function Home() {
             </div>
             <div className="w-full flex justify-center md:justify-start gap-3">
               <div
-                className="relative group cursor-pointer z-20"
+                className="group cursor-pointer"
               // onClick={() => setIsDownloadMenuOpen(!isDownloadMenuOpen)}
               // onMouseEnter={() => setIsDownloadMenuOpen(true)}
               // onMouseLeave={() => setIsDownloadMenuOpen(false)}
