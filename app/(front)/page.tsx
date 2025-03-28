@@ -354,7 +354,7 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   window.open(
-                    `https://qz.run/download/${versions?.["android"]?.download_url ?? ""
+                    `https://download.qz.run/download/${versions?.["android"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -399,7 +399,7 @@ export default function Home() {
               <div className="w-full flex flex-col gap-3">
                 <Button className="w-full" variant="outline" onClick={() => {
                   window.open(
-                    `https://qz.run/download/${versions?.["macos-x64"]?.download_url ?? ""
+                    `https://download.qz.run/download/${versions?.["macos-x64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -408,7 +408,7 @@ export default function Home() {
                 </Button>
                 <Button className="w-full" variant="outline" onClick={() => {
                   window.open(
-                    `https://qz.run/download/${versions?.["macos-arm64"]?.download_url ?? ""
+                    `https://download.qz.run/download/${versions?.["macos-arm64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
@@ -437,7 +437,7 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   window.open(
-                    `https://qz.run/download/${versions?.["windows-x64"]?.download_url ?? ""
+                    `https://download.qz.run/download/${versions?.["windows-x64"]?.download_url ?? ""
                     }`,
                     '_blank'
                   );
