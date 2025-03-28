@@ -54,8 +54,7 @@ export function SignupForm({
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const inviteCode = params.get("code") || "";
+    const inviteCode = code || '';
     setFormData({
       ...formData,
       inviteCode,

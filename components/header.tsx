@@ -144,7 +144,7 @@ export default function Header({ logined }: { logined: boolean }) {
                     登录
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/register">
                   <Button size="sm">注册</Button>
                 </Link>
               </>
