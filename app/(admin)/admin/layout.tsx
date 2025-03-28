@@ -17,7 +17,7 @@ import {
   SidebarGroupContent,
   SidebarMenuSub,
   SidebarMenuSubItem,
-  SidebarMenuSubButton
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
@@ -42,11 +42,15 @@ import {
   ChartColumn,
   Server,
   MonitorCog,
-  NotepadText
+  NotepadText,
 } from "lucide-react";
 import Link from "next/link";
 import * as react from "react";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+
+
+
 
 type SidebarItem = {
   title: string;
@@ -135,7 +139,7 @@ const newItems: SidebarItem[] = [
   {
     title: "用户与邀请",
     url: "#",
-    icon:  Users,
+    icon: Users,
     items: [
       { title: "用户管理", url: "/admin/users" },
       { title: "邀请码", url: "/admin/invite-codes" },
@@ -152,7 +156,7 @@ const newItems: SidebarItem[] = [
       { title: "区域管理", url: "/admin/nodes-loc" },
       { title: "节点", url: "/admin/nodes" },
       { title: "节点组", url: "#" },
-      { title: "套餐", url: "#" },
+      { title: "套餐", url: "/admin/thali" },
     ],
   },
   {
@@ -172,6 +176,9 @@ const newItems: SidebarItem[] = [
     items: [{ title: "连接日志", url: "/admin/connection-logs" }],
   },
 ];
+const RightButtonGroup = {
+  "/admin/thali":<Button className="rounded-md w-22 h-8"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>
+}
 
 const SidebarMenuLink = ({ item }: { item: SidebarItem }) => {
   const { setOpenMobile } = useSidebar();
@@ -197,7 +204,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [isAdmin, setIsAdmin] = useState(false);
-
+  const pathname = usePathname();
+  console.log("pathname", pathname);
+  
   useEffect(() => {
     // 检查是否是管理员
     const checkAdmin = () => {
@@ -225,7 +234,7 @@ export default function AdminLayout({
       {/* 侧边栏 */}
       <SidebarProvider>
         <Sidebar>
-          <SidebarHeader >
+          <SidebarHeader>
             <div className="pl-4 p-6">
               <h1 className="text-xl font-semibold">后台管理系统</h1>
             </div>
@@ -244,24 +253,23 @@ export default function AdminLayout({
                     className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   >
                     <CollapsibleTrigger>
-                    <item.icon className="h-5 w-5" />
-                     <span className="ml-2">{item.title}</span>  
+                      <item.icon className="h-5 w-5" />
+                      <span className="ml-2">{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                     </CollapsibleTrigger>
                   </SidebarGroupLabel>
-                  <CollapsibleContent >
+                  <CollapsibleContent>
                     <SidebarGroupContent>
                       <SidebarMenu>
-                      <SidebarMenuSub>
-                      
+                        <SidebarMenuSub>
                           {item.items.map((itemb) => (
                             <SidebarMenuSubItem key={itemb.title}>
-                               <SidebarMenuSubButton asChild >
-                          <Link href={itemb.url}>{itemb.title}</Link>
-                        </SidebarMenuSubButton>
-                           </SidebarMenuSubItem>
-                    ))}
-                          </SidebarMenuSub>
+                              <SidebarMenuSubButton asChild>
+                                <Link href={itemb.url}>{itemb.title}</Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
                       </SidebarMenu>
                     </SidebarGroupContent>
                   </CollapsibleContent>
@@ -277,16 +285,17 @@ export default function AdminLayout({
             <div className="h-full px-6 flex items-center justify-between">
               <SidebarTrigger />
               <h2 className="text-lg font-medium"></h2>
-              <Button variant="ghost" size="sm" asChild>
+              {RightButtonGroup[pathname]}
+              {/* <Button variant="ghost" size="sm" asChild>
                 <Link href="/" className="flex items-center space-x-2">
                   <ArrowLeft className="h-4 w-4" />
                   <span>返回首页</span>
                 </Link>
-              </Button>
+              </Button> */}
             </div>
           </header>
-          <main className="flex-1 overflow-auto p-6">
-            <div className="mx-auto max-w-[1920px]">{children}</div>
+          <main className="flex-1 overflow-auto p-4">
+            <div className="max-w-[1920px]">{children}</div>
           </main>
         </div>
         {/* <Toaster /> */}
