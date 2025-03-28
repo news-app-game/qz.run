@@ -22,7 +22,7 @@ export function SignupForm({
   className,
   code,
   ...props
-}: React.ComponentProps<"div"> & { code: string }) {
+}: React.ComponentProps<"div"> & { code?: string }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
