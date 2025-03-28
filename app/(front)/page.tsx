@@ -376,11 +376,12 @@ export default function Home() {
                 variant="outline"
                 className="flex-1"
                 onClick={() => {
-                  window.open(
-                    `https://qz.run/download/${versions?.["ios"]?.download_url ?? ""
-                    }`,
-                    '_blank'
-                  );
+                  alert("iOS 版本正在开发中，敬请期待！");
+                  // window.open(
+                  //   `https://qz.run/download/${versions?.["ios"]?.download_url ?? ""
+                  //   }`,
+                  //   '_blank'
+                  // );
                 }}
               >
                 下载
