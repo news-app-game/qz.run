@@ -13,11 +13,10 @@ function InvitationCodeList({ codes }: { codes: Array<any> }) {
     )
 }
 
-function InvitationCodeItem({ code }: { code: string}) {
-   
+function InvitationCodeItem({ code }: { code: string }) {
 
     return (
-        <Link href={`/signup?code=${code}`}>
+        <Link href={`/register?aff=${code}`}>
             <div className="flex items-center justify-center border rounded-md p-2 hover:bg-slate-100 hover:cursor-pointer">{code}</div>
         </Link>
     )
