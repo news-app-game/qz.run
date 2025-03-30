@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "qz.run",
+  "version": "0.0.13",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
