@@ -4,7 +4,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getUser } from "@/tools/auth";
 import { refreshInstance } from "@/tools/refresh-instance";
 import { CaretDown } from "@phosphor-icons/react"
@@ -24,8 +24,6 @@ interface User {
 export default function Header({ logined }: { logined: boolean }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!logined) {
@@ -41,22 +39,6 @@ export default function Header({ logined }: { logined: boolean }) {
       setLoading(false);
     }
   }, [logined]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleLogout = () => {
     refreshInstance.logout();
@@ -107,14 +89,14 @@ export default function Header({ logined }: { logined: boolean }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {user.email}
+                    {user?.email || '未知用户'}
                     <CaretDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
                     {
-                      user.admin_role === 1 && (
+                      user?.admin_role === 1 && (
                         <DropdownMenuItem>
                           <Link
                             href="/admin"
