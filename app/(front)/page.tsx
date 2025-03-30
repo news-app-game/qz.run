@@ -1,137 +1,22 @@
 "use client";
-import {
-  Section,
-  SectionHeader,
-  SectionTitle,
-  SectionDescription,
-} from "@/components/section";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Section, SectionHeader, SectionTitle, SectionDescription } from "@/components/section";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
 import Image from "next/image";
-import {
-  Lightning,
-  Cpu,
-  ShieldCheckered,
-  ArrowsDownUp,
-  AndroidLogo,
-  AppleLogo,
-  WindowsLogo,
-} from "@phosphor-icons/react/dist/ssr";
+import { Lightning, Cpu, ShieldCheckered, ArrowsDownUp, AndroidLogo, AppleLogo, WindowsLogo, } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { detectOSAndArchitecture, OperatingSystem } from "@/lib/utils";
 import { fetchVersions, VersionData } from "@/lib/apis";
 
 export default function Home() {
-  const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
   const [versions, setVersions] = useState<VersionData | null>(null);
-  const [system, setSystem] = useState<OperatingSystem>("Unknown");
-  const detectOSAndArch = async () => {
-    const { os } = await detectOSAndArchitecture();
-    setSystem(os);
-  };
 
   useEffect(() => {
-    detectOSAndArch();
     fetchVersions().then((versions) => setVersions(versions));
   }, []);
 
-  const SystemIcon = () => {
-    if (system === "Windows") {
-      return (
-        <svg
-          className="w-5 h-5 text-[#ffffff]"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M0 12v-8.646l10-1.355v10.001h-10zm11 0h13v-12l-13 1.807v10.193zm-1 1h-10v7.646l10 1.355v-9.001zm1 0v9.194l13 1.806v-11h-13z" />
-        </svg>
-      );
-    } else if (system === "MacOS" || system === "iOS") {
-      return (
-        <svg
-          className="icon w-5 h-5 relative bottom-[1px]"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M645.289723 165.758826C677.460161 122.793797 701.865322 62.036894 693.033384 0c-52.607627 3.797306-114.089859 38.61306-149.972271 84.010072-32.682435 41.130375-59.562245 102.313942-49.066319 161.705521 57.514259 1.834654 116.863172-33.834427 151.294929-79.956767zM938.663644 753.402663c-23.295835 52.820959-34.517089 76.415459-64.511543 123.177795-41.855704 65.279538-100.905952 146.644295-174.121433 147.198957-64.980873 0.725328-81.748754-43.30636-169.982796-42.751697-88.234042 0.46933-106.623245 43.605024-171.732117 42.965029-73.130149-0.682662-129.065752-74.026142-170.964122-139.348347-117.11917-182.441374-129.44975-396.626524-57.172928-510.545717 51.327636-80.895427 132.393729-128.212425 208.553189-128.212425 77.482118 0 126.207106 43.519692 190.377318 43.519692 62.292892 0 100.137957-43.647691 189.779989-43.647691 67.839519 0 139.732344 37.802399 190.889315 103.03927-167.678812 94.036667-140.543004 339.069598 28.885128 404.605134z"
-            fill="#ffffff"
-          ></path>
-        </svg>
-      );
-    } else if (system === "Android") {
-      return (
-        <svg
-          className="icon w-5 h-5 relative bottom-[1px]"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          width="200"
-          height="200"
-        >
-          <path
-            fill="#ffffff"
-            d="M229.493567 343.057721h565.073089v409.938453a67.449841 67.449841 0 0 1-67.02828 67.750957h-46.311543v139.717528a63.414895 63.414895 0 1 1-126.82979 0v-139.717528H469.602957v139.717528c0 35.049828-28.42529 63.354672-63.535341 63.354672a63.234226 63.234226 0 0 1-62.752442-63.354672l-0.542007-139.717528h-45.588866a67.570287 67.570287 0 0 1-67.690734-67.750957V343.057721z m-87.443901-11.683276a63.234226 63.234226 0 0 0-63.414895 62.752441v264.740626c0 35.110051 28.365067 63.354672 63.414895 63.354672s62.752441-28.304844 62.752442-63.354672V394.126886c0-34.387374-28.184398-62.752441-62.752442-62.752441z m654.323682-10.478815H227.024422c0-97.862493 58.536826-182.837248 145.318273-227.101206L328.560522 13.215953a8.973238 8.973238 0 0 1 3.071376-12.34573c4.275838-1.866915 9.876584-0.662454 12.34573 3.733831l44.263958 81.240925c37.63942-16.681791 79.494456-25.895921 123.758414-25.895922s86.118993 9.21413 123.758414 25.835698L680.022372 4.543831c2.469146-4.336061 8.069892-5.540523 12.34573-3.733831a8.973238 8.973238 0 0 1 3.071376 12.34573l-43.782173 80.578471c86.23944 44.324181 144.716043 129.298936 144.716043 227.161429zM406.067616 194.126063a23.968783 23.968783 0 0 0-23.90856-24.029006 23.90856 23.90856 0 0 0-23.426775 24.029006c0 12.887737 10.418592 23.968783 23.426775 23.968782a23.90856 23.90856 0 0 0 23.90856-23.968782z m259.200103 0a23.90856 23.90856 0 0 0-23.426775-24.029006 23.968783 23.968783 0 0 0 0 47.997788 23.788114 23.788114 0 0 0 23.426775-23.968782z m216.682615 137.248382a62.631995 62.631995 0 0 0-62.752442 62.752441v264.740626a63.053557 63.053557 0 1 0 126.167337 0V394.126886a62.872888 62.872888 0 0 0-63.414895-62.752441z"
-          ></path>
-        </svg>
-      );
-    } else {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-          />
-        </svg>
-      );
-    }
-  };
-
   const DownloadButton = () => {
-    let href: string | undefined;
-    const baseURL = "https://qz.run/download/";
-    if (system === "Windows") {
-      href = `${baseURL}${versions?.["windows-x64"]?.download_url ?? ""}`;
-    }
-    if (system === "MacOS") {
-      href = `${baseURL}${versions?.["macos-x64"]?.download_url ?? ""}`;
-    }
-    if (system === "Android") {
-      href = `${baseURL}${versions?.["android"]?.download_url ?? ""}`;
-    }
-    if (system === "iOS") {
-      // iOS 版本开发中，不设置下载链接
-      href = undefined;
-    }
-
-    const handleClick = (event: { preventDefault: () => void }) => {
-      if (!href) {
-        event.preventDefault();
-        // 如果是 iOS，显示开发中提示
-        if (system === "iOS") {
-          alert("iOS 版本正在开发中，敬请期待！");
-        }
-      }
-    };
-
     return (
       <Link href="#download">
         <Button className="md:w-auto" size="lg">下载客户端</Button>
@@ -153,65 +38,8 @@ export default function Home() {
             </div>
             <div className="w-full flex justify-center md:justify-start gap-3">
               <div
-                className="group cursor-pointer"
-              // onClick={() => setIsDownloadMenuOpen(!isDownloadMenuOpen)}
-              // onMouseEnter={() => setIsDownloadMenuOpen(true)}
-              // onMouseLeave={() => setIsDownloadMenuOpen(false)}
-              >
+                className="group cursor-pointer">
                 <DownloadButton />
-                {isDownloadMenuOpen && (
-                  <div className="absolute left-0 right-0 mt-0">
-                    <div className="bg-white rounded-b-lg shadow-xl border border-gray-100 overflow-hidden">
-                      <a
-                        href={`https://qz.run/download/${versions?.["windows-x64"]?.download_url ?? ""
-                          }`}
-                        target="_blank"
-                        className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
-                      >
-                        <i className="fa fa-windows text-[#3B82F6]"></i>
-                        Windows(x64)
-                      </a>
-                      <a
-                        href={`https://qz.run/download/${versions?.["macos-arm64"]?.download_url ?? ""
-                          }`}
-                        target="_blank"
-                        className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
-                      >
-                        <i className="fa fa-apple text-[#3B82F6]"></i>
-                        MacOS (ARM64)
-                      </a>
-                      <a
-                        href={`https://qz.run/download/${versions?.["macos-x64"]?.download_url ?? ""
-                          }`}
-                        target="_blank"
-                        className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
-                      >
-                        <i className="fa fa-apple text-[#3B82F6]"></i>
-                        MacOS (Intel)
-                      </a>
-                      <a
-                        href={`https://qz.run/download/${versions?.["android"]?.download_url ?? ""
-                          }`}
-                        target="_blank"
-                        className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
-                      >
-                        <i className="fa fa-android text-[#3B82F6]"></i>
-                        Android
-                      </a>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          alert("iOS 版本正在开发中，敬请期待！");
-                        }}
-                        className="block px-8 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#3B82F6] transition-colors duration-200 flex items-center gap-3"
-                      >
-                        <i className="fa fa-apple text-[#3B82F6]"></i>
-                        iOS
-                      </a>
-                    </div>
-                  </div>
-                )}
               </div>
               <Link href="/invitation-code">
                 <Button className="md:w-auto" size="lg" variant="outline">
@@ -377,11 +205,6 @@ export default function Home() {
                 className="flex-1"
                 onClick={() => {
                   alert("iOS 版本正在开发中，敬请期待！");
-                  // window.open(
-                  //   `https://qz.run/download/${versions?.["ios"]?.download_url ?? ""
-                  //   }`,
-                  //   '_blank'
-                  // );
                 }}
               >
                 下载
