@@ -167,7 +167,13 @@ export default function VersionManagement() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => window.open('/'+version.download_url, '_blank')}
+                    onClick={() => {
+                      if (version.download_url) {
+                        window.open(`https://download.qz.run/download/${version.download_url}`, '_blank');
+                      } else {
+                        console.log('下载链接不存在');
+                      }
+                    }}
                   >
                     <Download className="h-4 w-4" />
                   </Button>
