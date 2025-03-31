@@ -15,6 +15,8 @@ export class RefreshToken {
   private fetchFunction: <T = unknown>(url: string, token: string) => Promise<T>;
   // 退出登录的回调函数
   private onLogout?: () => void;
+  // 默认过期时间 1天
+  private defaultExpireTime = 1000 * 60 * 60 * 24 * 1;
   // 是否正在刷新token
   private tokenLoading = {
     value: false,
@@ -23,11 +25,11 @@ export class RefreshToken {
       this.tokenLoading.subscribeList.push(callback);
     },
     unsubscribe: (callback: (value: boolean) => void) => {
-      this.tokenLoading.subscribeList = this.tokenLoading.subscribeList.filter((item) => item !== callback);
+      this.tokenLoading.subscribeList = this.tokenLoading.subscribeList.filter(item => item !== callback);
     },
     setValue: (value: boolean) => {
       this.tokenLoading.value = value;
-      this.tokenLoading.subscribeList.forEach((callback) => callback(value));
+      this.tokenLoading.subscribeList.forEach(callback => callback(value));
     },
   };
 
@@ -36,13 +38,14 @@ export class RefreshToken {
   private TOKEN_EXPIRE_TIME_NAME = 'token-expires';
 
   /**
-   *
+   * 
    * @param {Object} options
    * @param {string} options.refreshUrl - 刷新token的url
    * @param {Function} options.fetchFunction - 刷新token的fetch函数
    * @param {Function} options.onLogout - 退出登录的回调函数
    * @param {string} options.cookiePrefix - cookie前缀
    * @param {boolean} options.disableInstance - 是否禁止单例模式
+   * @param {number} options.defaultExpireTime - 如果没有过期时间，默认过期时间
    */
   constructor({
     refreshUrl,
@@ -50,12 +53,14 @@ export class RefreshToken {
     onLogout,
     cookiePrefix,
     disableInstance,
+    defaultExpireTime,
   }: {
     refreshUrl: string;
     fetchFunction?: RefreshToken['fetchFunction'];
     onLogout?: () => void;
     cookiePrefix?: string;
     disableInstance?: boolean;
+    defaultExpireTime?: number;
   }) {
     this.cookiePrefix = cookiePrefix;
     this.refreshUrl = refreshUrl;
@@ -64,6 +69,7 @@ export class RefreshToken {
     this.token = RefreshToken.getCookie(this.addCookiePrefix(this.TOKEN_NAME)) || '';
     this.tokenExpireTime = Number(RefreshToken.getCookie(this.addCookiePrefix(this.TOKEN_EXPIRE_TIME_NAME))) || 0;
     this.tokenCreateTime = Number(RefreshToken.getCookie(this.addCookiePrefix(this.TOKEN_CREATE_TIME_NAME))) || 0;
+    this.defaultExpireTime = defaultExpireTime || this.defaultExpireTime;
     this.initCheck();
     if (disableInstance !== true && RefreshToken.instance && refreshUrl === RefreshToken.instance.getRefreshUrl()) {
       return RefreshToken.instance;
@@ -77,7 +83,7 @@ export class RefreshToken {
       this.logout();
     }
   }
-
+  
   // 默认的fetch函数
   private defaultFetchFunction(url: string, token: string) {
     return fetch(url, {
@@ -86,7 +92,7 @@ export class RefreshToken {
         Authorization: `Bearer ${token}`,
       },
       credentials: 'include',
-    }).then((res) => res.json());
+    }).then(res => res.json());
   }
 
   // cookie添加前缀
@@ -107,7 +113,7 @@ export class RefreshToken {
     if (this.tokenCreateTime < new Date().getTime() - 150000) {
       // 如果正在刷新token，则等待刷新完成
       if (this.tokenLoading.value) {
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
           const callback = (value: boolean) => {
             // 如果刷新完成，则返回token
             if (!value) {
@@ -123,10 +129,10 @@ export class RefreshToken {
       // 设置正在刷新token
       this.tokenLoading.setValue(true);
       try {
-        const res = await this.fetchFunction<{ token: string; expire: number }>(this.refreshUrl, this.token);
+        const res = await this.fetchFunction<{ token: string, expire: number }>(this.refreshUrl, this.token);
         // 如果刷新成功，则设置token
         if (res.token) {
-          this.setToken(res.token, res.expire);
+          this.setToken(res.token, res.expire ? Number(res.expire) * 1000 : res.expire);
           this.tokenLoading.setValue(false);
           return res.token;
         } else {
@@ -171,12 +177,13 @@ export class RefreshToken {
     return this.refreshUrl;
   }
 
+
   // 登录后设置token
-  public setToken(token: string, expireTime?: number | string) {
+  public setToken(token: string, expireTime?: number|string) {
     this.token = token;
     this.tokenCreateTime = new Date().getTime();
-    // 默认过期时间30天
-    this.tokenExpireTime = new Date().getTime() + (expireTime ? Number(expireTime) : 1000 * 60 * 60 * 24 * 30);
+    // 默认过期时间1天
+    this.tokenExpireTime = new Date().getTime() + (expireTime ? Number(expireTime) : this.defaultExpireTime);
     RefreshToken.setCookie(this.addCookiePrefix(this.TOKEN_NAME), token, this.tokenExpireTime);
     RefreshToken.setCookie(this.addCookiePrefix(this.TOKEN_CREATE_TIME_NAME), this.tokenCreateTime.toString(), this.tokenExpireTime);
     RefreshToken.setCookie(this.addCookiePrefix(this.TOKEN_EXPIRE_TIME_NAME), this.tokenExpireTime.toString(), this.tokenExpireTime);
@@ -207,7 +214,9 @@ export class RefreshToken {
    * 判断是否是登录状态
    */
   public isLogin() {
-    return this.token && this.tokenCreateTime && this.tokenExpireTime > new Date().getTime();
+    return this.token && this.tokenCreateTime && (
+      this.tokenExpireTime > new Date().getTime()
+    );
   }
 
   /**
@@ -253,7 +262,9 @@ export class RefreshToken {
   }
 }
 
+
 /**
+ * example
  * example
  * const refreshToken = new RefreshToken({
  *   refreshUrl: '/api/auth/refresh-token',
@@ -265,15 +276,16 @@ export class RefreshToken {
  *     console.log('token过期/刷新失败，退出登录');
  *   },
  * });
- *
+ * 
  * // 获取token
  * const token = await refreshToken.getToken();
- *
+ * 
  * // 退出登录
  * refreshToken.logout();
  */
+
 /**
- *
+ * 
  * 基本流程：
  * 1. 登录获取token，调用refreshToken.setToken设置token
  * 2. 每次请求调用refreshToken.getToken（fetch方法需要防止重复请求）获取token
