@@ -104,7 +104,7 @@ export class RefreshToken {
       return null;
     }
     // 如果创建时间距离当前时间大于10700000ms(3小时-100s)，则需要刷新token
-    if (this.tokenCreateTime < new Date().getTime() - 10700000) {
+    if (this.tokenCreateTime < new Date().getTime() - 150000) {
       // 如果正在刷新token，则等待刷新完成
       if (this.tokenLoading.value) {
         await new Promise((resolve) => {

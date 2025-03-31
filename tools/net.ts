@@ -115,6 +115,12 @@ instance.interceptors.response.use(
         default:
           console.error(`其他错误：${error.response.status}`);
       }
+      if (error.response?.data?.code === 401) {
+        if (isClient) {
+          refreshInstance.logout();
+        }
+        console.log('401');
+      }
       return Promise.reject(error.response.data);
     } else if (error.request) {
       // 请求已经发出，但没有收到响应
