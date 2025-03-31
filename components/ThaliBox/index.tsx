@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button } from "@/components/ui/button" 
+import Link from "next/link";
 export type Content = {
   label: string
   key: string
@@ -16,7 +17,7 @@ const ThaliBox = (props: ThaliBox) => {
     <div className='w-[370.67px] rounded-lg border border-[#E5E7EB]'>
       <div className='px-5 py-3 border-b border-[#F0F0F0] flex justify-between items-center'>
         <div className='text-base font-bold'>{ title}</div>
-        <Button variant="outline" className='w-15 h-8 rounded-md'>编辑</Button>
+        <Button variant="outline" className='w-15 h-8 rounded-md'> <Link href={`/admin/generateThali?id=${1}`}  > 编辑</Link> </Button>
       </div>
       <div className='p-5 flex flex-col gap-4 '>
         {content.map((item) => (

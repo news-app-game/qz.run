@@ -1,6 +1,6 @@
 'use client';
 import React, { useState} from 'react'
-import ThaliBox, { Content, ThaliBoxProps } from "@/components/ThaliBox"
+import ThaliBox, { Content } from "@/components/ThaliBox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -9,9 +9,13 @@ type ThaliBoxContent = {
   content: Content[]
 }
 type FormBody = {
-  key1: string,
-  key2: string,
-  key3: string,
+  key1?: string,
+  key2?: string,
+  key3?: string,
+}
+type DiscountItem = {
+  label: string,
+  key: keyof FormBody,
 }
 const free = {
   title: "免费套餐",
@@ -48,7 +52,7 @@ const thailBoxContent:ThaliBoxContent[] = [
   ordinary,
   senior,
 ]
-const discountFormItems:Content[] = [
+const discountFormItems:DiscountItem[] = [
   { label: "季付", key: "key1" },
   { label: "半年付", key: "key2" },
   { label: "年付", key: "key3" },
