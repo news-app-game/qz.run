@@ -14,16 +14,18 @@ import { toast } from "sonner";
 import { login } from "@/api/user";
 import { setUser } from "@/tools/auth";
 import { refreshInstance } from '@/tools/refresh-instance';
-
+import { Loader2 } from "lucide-react"
+import { useState } from "react"
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [isLoading, setIsLoading] = useState(false);
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const email = (e.target as any).email.value;
     const password = (e.target as any).password.value;
-
+    setIsLoading(true);
     login({
       email,
       password
@@ -39,6 +41,9 @@ export function LoginForm({
       })
       .catch((error) => {
         console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       })
   }
   return (
@@ -68,7 +73,8 @@ export function LoginForm({
                   </div>
                   <Input id="password" type="password" required />
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="animate-spin" />}
                   登录
                 </Button>
               </div>
