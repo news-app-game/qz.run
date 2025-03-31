@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation";
 interface User {
   email: string;
   admin_role: number;
@@ -24,6 +25,7 @@ interface User {
 export default function Header({ logined }: { logined: boolean }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (!logined) {
@@ -97,25 +99,29 @@ export default function Header({ logined }: { logined: boolean }) {
                   <DropdownMenuGroup>
                     {
                       user?.admin_role === 1 && (
-                        <DropdownMenuItem>
-                          <Link
-                            href="/admin"
-                          >
-                            管理后台
-                          </Link>
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => {
+                          router.push('/admin')
+                        }}>
+                          管理后台
                         </DropdownMenuItem>
                       )
                     }
-                    <DropdownMenuItem>
-                      <Link href="/invite-records">邀请记录</Link>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => {
+                      router.push('/invite-records')
+                    }}>
+                      邀请记录
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/reward-records">奖励记录</Link>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => {
+                      router.push('/reward-records')
+                    }}>
+                      奖励记录
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link href="" onClick={handleLogout}>退出登录</Link>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => {
+                    handleLogout()
+                  }}>
+                    退出登录
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
