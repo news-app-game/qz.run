@@ -58,89 +58,73 @@ type SidebarItem = {
   icon: react.ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & react.RefAttributes<SVGSVGElement>
   >;
-  items: Omit<SidebarItem,"items"|"icon"> [];
+  items: SidebarItem[];
 };
 
-// const items: SidebarItem[] = [
-//   {
-//     title: "控制台",
-//     url: "/admin",
-//     icon: Home,
-//   },
-//   {
-//     title: "用户管理",
-//     url: "/admin/users",
-//     icon: Users,
-//   },
-//   {
-//     title: "邀请码",
-//     url: "/admin/invite-codes",
-//     icon: Ticket,
-//   },
-//   {
-//     title: "邀请记录",
-//     url: "/admin/invite-records",
-//     icon: UserPlus,
-//   },
-//   {
-//     title: "奖励记录",
-//     url: "/admin/rewards-records",
-//     icon: Gift,
-//   },
-//   {
-//     title: "节点列表",
-//     url: "/admin/nodes",
-//     icon: Network,
-//   },
-//   {
-//     title: "区域管理",
-//     url: "/admin/nodes-loc",
-//     icon: MapPinned,
-//   },
-//   {
-//     title: "系统配置",
-//     url: "/admin/site-configs",
-//     icon: Cog,
-//   },
-//   {
-//     title: "公告管理",
-//     url: "/admin/announcements",
-//     icon: Bell,
-//   },
+const items: SidebarItem[] = [
+  {
+    title: "控制台",
+    url: "/admin",
+    icon: Home,
+  },
+  {
+    title: "用户管理",
+    url: "/admin/users",
+    icon: Users,
+  },
+  {
+    title: "邀请码",
+    url: "/admin/invite-codes",
+    icon: Ticket,
+  },
+  {
+    title: "邀请记录",
+    url: "/admin/invite-records",
+    icon: UserPlus,
+  },
+  {
+    title: "奖励记录",
+    url: "/admin/rewards-records",
+    icon: Gift,
+  },
+  {
+    title: "节点列表",
+    url: "/admin/nodes",
+    icon: Network,
+  },
+  {
+    title: "区域管理",
+    url: "/admin/nodes-loc",
+    icon: MapPinned,
+  },
+  {
+    title: "系统配置",
+    url: "/admin/site-configs",
+    icon: Cog,
+  },
+  {
+    title: "公告管理",
+    url: "/admin/announcements",
+    icon: Bell,
+  },
 
-//   {
-//     title: "版本记录",
-//     url: "/admin/versions",
-//     icon: History,
-//   },
-//   {
-//     title: "连接日志",
-//     url: "/admin/connection-logs",
-//     icon: Link2Icon,
-//   },
-//   {
-//     title: "用户反馈",
-//     url: "/admin/feedbacks",
-//     icon: HelpCircle,
-//   },
-// ];
-// const SidebarMenuLink = ({ item }: { item: SidebarItem }) => {
-//   const { setOpenMobile } = useSidebar();
-//   return (
-//     <SidebarMenuItem key={item.title}>
-//       <SidebarMenuButton asChild>
-//         <Link
-//           href={item.url}
-//           onClick={() => setOpenMobile(false)}
-//           className="flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground"
-//         >
-//           <item.icon className="h-5 w-5" />
-//           <span>{item.title}</span>
-//         </Link>
-//       </SidebarMenuButton>
-//     </SidebarMenuItem>
-//   );
-// };
+  {
+    title: "版本记录",
+    url: "/admin/versions",
+    icon: History,
+  },
+  {
+    title: "连接日志",
+    url: "/admin/connection-logs",
+    icon: Link2Icon,
+  },
+  {
+    title: "用户反馈",
+    url: "/admin/feedbacks",
+    icon: HelpCircle,
+  },
+];
+
 const newItems: SidebarItem[] = [
   {
     title: "数据看板",
@@ -192,17 +176,27 @@ const newItems: SidebarItem[] = [
     items: [{ title: "连接日志", url: "/admin/connection-logs" }],
   },
 ];
-const RightButtonGroup: Record<string, react.ReactElement> = {
-  "/admin":<Button variant="ghost" size="sm" asChild>
-  <Link href="/" className="flex items-center space-x-2">
-    <ArrowLeft className="h-4 w-4" />
-    <span>返回首页</span>
-  </Link>
-</Button>,
+const RightButtonGroup = {
   "/admin/thali":<Button className="rounded-md w-22 h-8"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>
 }
 
-
+const SidebarMenuLink = ({ item }: { item: SidebarItem }) => {
+  const { setOpenMobile } = useSidebar();
+  return (
+    <SidebarMenuItem key={item.title}>
+      <SidebarMenuButton asChild>
+        <Link
+          href={item.url}
+          onClick={() => setOpenMobile(false)}
+          className="flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground"
+        >
+          <item.icon className="h-5 w-5" />
+          <span>{item.title}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
 
 export default function AdminLayout({
   children,
@@ -259,7 +253,7 @@ export default function AdminLayout({
                     className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   >
                     <CollapsibleTrigger>
-                     <item.icon className="h-5 w-5" />  
+                      <item.icon className="h-5 w-5" />
                       <span className="ml-2">{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                     </CollapsibleTrigger>
