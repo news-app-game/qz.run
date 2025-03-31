@@ -171,7 +171,7 @@ const newItems: SidebarItem[] = [
     items: [
       { title: "区域管理", url: "/admin/nodes-loc" },
       { title: "节点", url: "/admin/nodes" },
-      { title: "节点组", url: "#" },
+      { title: "节点组", url: "/admin/nodes-group" },
       { title: "套餐", url: "/admin/thali" },
     ],
   },
@@ -199,7 +199,18 @@ const RightButtonGroup: Record<string, react.ReactElement> = {
     <span>返回首页</span>
   </Link>
 </Button>,
-  "/admin/thali":<Button className="rounded-md w-22 h-8"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>
+  "/admin/thali": <Button className="rounded-md w-22 h-8 !bg-[#1677FF]"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>,
+  "/admin/generateThali": <div className="flex gap-2 items-center">
+    <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
+    <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>
+    <Button  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>
+  </div>,
+  "/admin/nodes-group": <Button className="rounded-md w-[102px] h-8 !bg-[#1677FF]"><Link href={"/admin/generateNodeGroup"}>添加节点组</Link></Button>,
+  "/admin/generateNodeGroup":<div className="flex gap-2 items-center">
+  <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
+  <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>
+  <Button  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>
+</div>,
 }
 
 
