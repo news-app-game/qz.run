@@ -10,7 +10,8 @@ export const getUser = () => {
 
 export const setUser = (user: User.User) => {
   const expires = new Date();
-  expires.setDate(expires.getDate() + 30);
+  // 设置3年有效期
+  expires.setFullYear(expires.getFullYear() + 3);
   setCookie('user', JSON.stringify(user), { expires });
 };
 
