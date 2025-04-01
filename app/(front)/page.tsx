@@ -8,6 +8,7 @@ import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchVersions, VersionData } from "@/lib/apis";
+import { PriceSection } from "@/components/sections/price-section";
 
 export default function Home() {
   const [versions, setVersions] = useState<VersionData | null>(null);
@@ -117,6 +118,8 @@ export default function Home() {
         </div>
       </Section>
 
+      <PriceSection />
+      
       <Section>
         <SectionHeader>
           <SectionTitle>跨平台可用</SectionTitle>

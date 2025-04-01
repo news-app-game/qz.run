@@ -106,6 +106,12 @@ export default function Header({ logined }: { logined: boolean }) {
                         </DropdownMenuItem>
                       )
                     }
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => {
+                      router.push('/subscription')
+                    }}>
+                      套餐和账单
+                    </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onClick={() => {
                       router.push('/invite-records')
                     }}>
