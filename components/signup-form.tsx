@@ -209,6 +209,10 @@ export function SignupForm({
     }
     return regInviteCodeSwitch.value === "off";
   }, [configs]);
+  // 邀请码的提示语，当inviteCodeDisabled为true时，提示语为“选填”，否则提示语为“必填”
+  const inviteCodePlaceholder = useMemo(() => {
+    return inviteCodeDisabled ? "选填" : "必填";
+  }, [inviteCodeDisabled]);
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -241,6 +245,7 @@ export function SignupForm({
                     onChange={(e) =>
                       setFormData({ ...formData, inviteCode: e.target.value })
                     }
+                    placeholder={inviteCodePlaceholder}
                   />
                   <p className="text-sm text-muted-foreground">
                     还没有邀请码？
