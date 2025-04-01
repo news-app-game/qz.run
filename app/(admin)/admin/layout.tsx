@@ -210,7 +210,8 @@ const RightButtonGroup: Record<string, react.ReactElement> = {
   <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
   <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>
   <Button  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>
-</div>,
+  </div>,
+   "/admin/nodes": <Button className="rounded-md w-[88px] h-8 !bg-[#1677FF]"> <Link href="/admin/nodes/modal/0">添加节点</Link></Button>,
 }
 
 

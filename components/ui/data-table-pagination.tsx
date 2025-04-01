@@ -33,7 +33,7 @@ export function DataTablePagination({
   };
 
   return (
-    <Pagination>
+    <Pagination className=" justify-end">
       <PaginationContent className="flex flex-col md:flex-row">
         <div className="flex flex-row">
           {currentPage > 1 && (

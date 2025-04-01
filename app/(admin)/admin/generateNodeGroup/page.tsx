@@ -2,7 +2,7 @@ import React from 'react'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
-import AdaptTable, { TableColumns } from '@/components/AdaptTable'
+import XwyaTable, { TableColumns} from '@/components/XwyaTable'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,27 +38,26 @@ const data:User[] = [
 const columns:TableColumns<User>[] = [
   {
     key: "name",
-    title: "节点名",
+    header: "节点名",
   },
-  { key: "email", title: "区域" },
-  { key: "role", title: "节点类型" },
-  { key: "a", title: "套了CF" },
+  { key: "email", header: "区域" },
+  { key: "role", header: "节点类型" },
+  { key: "a", header: "套了CF" },
   {
-    key: "b", title: "状态",
-    headCell: () => (
+    key: "b", header: "状态",
+    headCell:(
       <div className='w-full flex justify-between items-center'>
         <span>状态</span>
         <img src="/FilterFilled.svg" alt="" />
       </div>
     ),
-    width:85
   },
-  { key: "d", title: "添加时间" },
-  { key: "c", title: "流量倍率" },
+  { key: "d", header: "添加时间" },
+  { key: "c", header: "流量倍率" },
   {
     key: "id",
-    title: "操作",
-    cell:()=>( <AlertDialog >
+    header: "操作",
+    cell:(<AlertDialog >
       <AlertDialogTrigger asChild>
       <div className=" text-[#007AFF]">移除</div>
       </AlertDialogTrigger>
@@ -107,7 +106,8 @@ const GenerateNodeGroup = (props:GenerateNodeGroupProps) => {
         </AddNodeDrawer>
       
         <div>
-        <AdaptTable<User>  data={data} columns={columns} />
+          <XwyaTable<User> data={data} columns={columns} />
+          
         </div>
         </div>
     </div>

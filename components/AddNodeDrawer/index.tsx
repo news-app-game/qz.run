@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { X,Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AdaptTable, { TableColumns } from "@/components/AdaptTable";
+import XwyaTable, {TableColumns} from "@/components/XwyaTable";
 type User = {
   id: number;
   name: string;
@@ -31,7 +31,6 @@ const data:User[] = [
 const columns:TableColumns<User>[] = [
   {
     key: "name",
-    title: "节点名",
     headCell: () => (
       <div className="w-full  flex items-center justify-between ">
         <div>节点名</div>
@@ -40,7 +39,7 @@ const columns:TableColumns<User>[] = [
     )
   },
   {
-    key: "email", title: "区域",
+    key: "email", 
     headCell: () => (
       <div className='w-full flex justify-between items-center'>
         <span>区域</span>
@@ -49,7 +48,7 @@ const columns:TableColumns<User>[] = [
     ),
   },
   {
-    key: "role", title: "节点类型",
+    key: "role", 
     headCell: () => (
       <div className='w-full flex justify-between items-center'>
         <span>节点类型</span>
@@ -57,19 +56,19 @@ const columns:TableColumns<User>[] = [
       </div>
     ),
    },
-  { key: "a", title: "套了CF" },
+  { key: "a", header: "套了CF" },
   {
-    key: "b", title: "状态",
+    key: "b", header: "状态",
     headCell: () => (
       <div className='w-full flex justify-between items-center'>
         <span>状态</span>
         <img src="/FilterFilled.svg" alt="" />
       </div>
     ),
-    width:85
   },
+
   {
-    key: "d", title: "地址",
+    key: "d", 
       headCell: () => (
           <div className="w-full  flex items-center justify-between ">
             <div>地址</div>
@@ -79,7 +78,7 @@ const columns:TableColumns<User>[] = [
    },
   {
     key: "id",
-    title: "操作",
+    header: "操作",
     cell:()=>( 
       <div className=" text-[#007AFF]">添加</div>
    ) 
@@ -95,7 +94,7 @@ const AddNodeDrawer = ({ children}: {children:React.ReactNode}) => {
         {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
       </DrawerHeader>
       <div className="p-6">
-        <AdaptTable<any> data={data} columns={columns} />
+        <XwyaTable<any> data={data} columns={columns} />
       </div>
       <DrawerFooter>
       </DrawerFooter>
