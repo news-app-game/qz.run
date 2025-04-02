@@ -8,6 +8,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Button } from "../ui/button"
 import { CheckCircle } from "@phosphor-icons/react"
 import { getPackages } from "@/api/packages"
+import { useRouter } from "next/navigation"
 
 type BillingCycle = 'monthly' | 'quarterly' | 'semi_annually' | 'annually'
 
@@ -110,76 +111,9 @@ interface PriceCardProps {
 	billingCycle: BillingCycle
 }
 
-function PriceCard({ plan, billingCycle }: PriceCardProps) {
-	return (
-		<Card>
-			<CardContent className="flex flex-col items-start gap-3">
-				<div className="flex flex-col items-start gap-1">
-					<CardTitle className="text-xl">{plan.name}</CardTitle>
-					<CardDescription className="text-sm">{plan.description}</CardDescription>
-				</div>
-
-				<div className="flex items-baseline gap-1">
-					<span className="text-2xl">￡</span>
-					<span className="text-[2.5rem] font-medium">{(plan.monthlyPrice * BILLING_CYCLES[billingCycle].discount).toFixed(2).replace(/\.?0+$/, '')}</span>
-					<span className="text-1xl text-muted-foreground">/ 月</span>
-					{((1 - BILLING_CYCLES[billingCycle].discount) * 100) > 0 && plan.monthlyPrice > 0 && (
-						<span className="text-xs bg-rose-400 text-white rounded px-[5px] py-[2px]">节约{((1 - BILLING_CYCLES[billingCycle].discount) * 100).toFixed(0)}%</span>
-					)}
-				</div>
-
-				<Button className="w-full" size="lg" onClick={() => plan.monthlyPrice === 0 ? document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' }) : null}>
-					{Number(plan.monthlyPrice) === 0 ? '立即下载' : '立即订阅'}
-				</Button>
-			</CardContent>
-
-			<Separator />
-
-			<CardFooter>
-				<div className="w-full flex flex-col gap-4">
-					<div className="flex flex-col gap-2">
-						<div className="text-xs text-muted-foreground">基础权益</div>
-						<ul className="flex flex-col gap-1">
-							{plan.features.base.map((feature, index) => (
-								<li key={index} className="flex items-center gap-1 m-0">
-									<CheckCircle size={20} className="text-green-500" weight="fill" />
-									{feature}
-								</li>
-							))}
-						</ul>
-					</div>
-					<div className="flex flex-col gap-2">
-						<div className="text-xs text-muted-foreground">线路</div>
-						<ul className="flex flex-col gap-1">
-							{plan.features.route.map((feature, index) => (
-								<li key={index} className="flex items-center gap-1 m-0">
-									<CheckCircle size={20} className="text-green-500" weight="fill" />
-									{feature}
-								</li>
-							))}
-						</ul>
-					</div>
-					{plan.features.others.length > 0 && (
-						<div className="flex flex-col gap-2">
-							<div className="text-xs text-muted-foreground">其他</div>
-							<ul className="flex flex-col gap-1">
-								{plan.features.others.map((feature, index) => (
-									<li key={index} className="flex items-center gap-1 m-0">
-										<CheckCircle size={20} className="text-green-500" weight="fill" />
-										{feature}
-									</li>
-								))}
-							</ul>
-						</div>
-					)}
-				</div>
-			</CardFooter>
-		</Card>
-	)
-}
-
 
 function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabKey: BillingCycleKey, siteConfig: Packages.SiteConfig | null }) {
+	const router = useRouter()
 	const price = useMemo(() => {
 		return plan[tabKey.valueKey] as string
 	}, [plan, tabKey])
@@ -221,7 +155,15 @@ function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabK
 					)}
 				</div>
 
-				<Button className="w-full" size="lg" onClick={() => plan.user_subscribed ? document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' }) : null}>
+				<Button className="w-full" size="lg" onClick={() => {
+					if (plan.user_subscribed) {
+						document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' })
+					} else {
+						const id = plan.id
+						const period = Object.keys(BILLING_CYCLES).find(key => BILLING_CYCLES[key as BillingCycle].valueKey === tabKey.valueKey)
+						router.push(`/payment?id=${id}&period=${period}`)
+					}
+				}}>
 					{plan.user_subscribed ? '立即下载' : '立即订阅'}
 				</Button>
 			</CardContent>
