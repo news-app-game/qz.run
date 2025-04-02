@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "./table";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { getOrderList } from "@/api/order";
 export default function SubscriptionCard({ className }: { className?: string }) {
   const router = useRouter()
   const columns = [
@@ -47,41 +48,29 @@ export default function SubscriptionCard({ className }: { className?: string }) 
     },
   ]
   const [data, setData] = useState<any[]>([])
+  const [pageSize, setPageSize] = useState<number>(20)
+  const [total, setTotal] = useState<number>(0)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [loading, setLoading] = useState<boolean>(false)
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await new Promise(resolve => {
-        setTimeout(() => {
-          const data = [
-            {
-              date: "2025-03-01",
-              amount: "7.92￡",
-              status: "1",
-              package: "普通套餐",
-              duration: "1个月",
-            },
-            {
-              date: "2025-03-01",
-              amount: "7.92￡",
-              status: "2",
-              package: "普通套餐",
-              duration: "1个月",
-            },
-            {
-              date: "2025-03-01",
-              amount: "7.92￡",
-              status: "3",
-              package: "普通套餐",
-              duration: "1个月",
-            },
-          ]
-          resolve(data)
-        }, 1000)
-      })
-      console.log('data', data)
-      setData(data as any[])
-    }
-    fetchData()
+    getList(currentPage)
   }, [])
+  const getList = async (page: number) => {
+    try {
+      setLoading(true)
+      const res = await getOrderList(page)
+      const { data, total, per_page, current_page } = res.data.orders
+      setPageSize(per_page)
+      setData(data)
+      setTotal(total)
+      setCurrentPage(current_page)
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      setLoading(false)
+    }
+
+  }
   return <Card className={cn(className)}>
     <CardHeader className="flex flex-row items-center justify-center">
       <CardTitle className="text-2xl font-bold">套餐和账单</CardTitle>
@@ -110,7 +99,18 @@ export default function SubscriptionCard({ className }: { className?: string }) 
           <p className="font-[500]">账单</p>
           <div className="flex flex-col gap-4">
             <div className="flex flex-row items-center justify-between ">
-              <DataTable columns={columns} data={data} />
+              <DataTable
+                loading={loading}
+                columns={columns}
+                data={data}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                total={total}
+                onPageChange={(page) => {
+                  console.log('page', page)
+                  getList(page)
+                }}
+              />
             </div>
           </div>
         </div>
