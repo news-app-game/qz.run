@@ -4,6 +4,8 @@ import Script from 'next/script';
 import { useSearchParams } from 'next/navigation';
 import { orderPayment } from '@/api/order';
 import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+
 declare global {
   interface Window {
     SumUpCard: {
@@ -16,7 +18,7 @@ declare global {
   }
 }
 
-export default function PaymentPage() {
+function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -59,5 +61,13 @@ export default function PaymentPage() {
         }}
       />
     </>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <PaymentContent />
+    </Suspense>
   );
 } 
