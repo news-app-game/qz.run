@@ -22,7 +22,7 @@ export default function InviteRecords() {
     try {
       const { code, data, message } = await getUserInviteRecords()
       if (code === 200) {
-        setRecords(data);
+        // setRecords(data);
         return
       } else {
         setError(message || "获取邀请记录失败");

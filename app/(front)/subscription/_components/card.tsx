@@ -6,7 +6,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "./table";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 export default function SubscriptionCard({ className }: { className?: string }) {
+  const router = useRouter()
   const columns = [
     {
       header: "账单日期",
@@ -91,7 +93,9 @@ export default function SubscriptionCard({ className }: { className?: string }) 
           <p className="font-[500]">套餐</p>
           <div className="flex items-center justify-start gap-2.5">
             <div className="font-[400]">当前套餐：普通套餐，<span className="font-[600]">7.92￡</span>/季</div>
-            <Button size="sm">更改套餐</Button>
+            <Button size="sm" onClick={() => {
+              router.push('/#choose-plan')
+            }}>更改套餐</Button>
           </div>
           <div className="flex items-center justify-start gap-2.5">
             <div className="font-[400]">您的套餐将于:  <span className="font-[600]">2025-03-01</span>/失效</div>
