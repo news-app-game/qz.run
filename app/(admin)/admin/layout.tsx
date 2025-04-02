@@ -1,5 +1,5 @@
 "use client";
-
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import {
@@ -48,9 +48,11 @@ import Link from "next/link";
 import * as react from "react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-
-
-
+import { createNodeGroup, updateNodeGroup } from "@/api/admin/nodes";
+import { createThali,updateThali } from "@/api/admin/thali";
+import bus from "@/tools/eventBus";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type SidebarItem = {
   title: string;
@@ -192,27 +194,7 @@ const newItems: SidebarItem[] = [
     items: [{ title: "连接日志", url: "/admin/connection-logs" }],
   },
 ];
-const RightButtonGroup: Record<string, react.ReactElement> = {
-  "/admin":<Button variant="ghost" size="sm" asChild>
-  <Link href="/" className="flex items-center space-x-2">
-    <ArrowLeft className="h-4 w-4" />
-    <span>返回首页</span>
-  </Link>
-</Button>,
-  "/admin/thali": <Button className="rounded-md w-22 h-8 !bg-[#1677FF]"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>,
-  "/admin/generateThali": <div className="flex gap-2 items-center">
-    <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
-    <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>
-    <Button  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>
-  </div>,
-  "/admin/nodes-group": <Button className="rounded-md w-[102px] h-8 !bg-[#1677FF]"><Link href={"/admin/generateNodeGroup"}>添加节点组</Link></Button>,
-  "/admin/generateNodeGroup":<div className="flex gap-2 items-center">
-  <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
-  <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>
-  <Button  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>
-  </div>,
-   "/admin/nodes": <Button className="rounded-md w-[88px] h-8 !bg-[#1677FF]"> <Link href="/admin/nodes/modal/0">添加节点</Link></Button>,
-}
+
 
 
 
@@ -222,10 +204,144 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [statusMap, setStatusMap] = useState<Record<string, boolean>>({
+    group: false,
+    thali:false
+  });
+  const [groupBody, setGroupBody] = useState<Record<string, any>>({})
+  const [thaliBody, setThaliBody] = useState<Record<string, any>>({});
   const pathname = usePathname();
-  console.log("pathname", pathname);
+  const router  = useRouter()
+
+ const removeLastPathSegment=(url:string):string=> {
+   const [path, query] = url.split("?"); // 分离路径和查询参数
+   
+   const basePath = path.split("/").filter(Boolean).slice(0, 2).join("/"); // 去掉最后一个路径部分
+   
+    return query ? `/${basePath}?${query}` : `/${basePath}`; // 重新拼接
+  }
+  const createNodeGroupSave = async () => { 
+    try {
+      const res: {code:number} = await createNodeGroup(groupBody)
+      if (res.code === 200) { 
+        toast.success("保存成功")
+        router.push("/admin/nodes-group")
+       }
+     }
+    catch (error) {
+      toast.error(`保存失败 ${error}`)
+    }
+  }
+  const updateNodeGroupSave = async () => {
+    try {
+      const res: {code:number} = await updateNodeGroup(groupBody as { id: string | number })
+      if (res.code === 200) { 
+        toast.success("保存成功")
+        router.push("/admin/nodes-group")
+       }
+     }
+    catch (error) {
+      toast.error(`保存失败 ${error}`)
+    }
+  }
+  const onSaveGroup = () => {
+    if (groupBody.id) {
+      updateNodeGroupSave()
+    } else { 
+      createNodeGroupSave()
+    }
+  }
+  const createThaliSave = async () => {
+    try {
+      let new_other_benefits = thaliBody.other_benefits.map((item: any) => (item.value))
+      let new_node_group_ids = thaliBody.node_group_ids.map((item: any) => (item.id))
+      const res = await createThali({...thaliBody, other_benefits: new_other_benefits, node_group_ids: new_node_group_ids}) as any
+      if (res.code === 200) {
+        toast.success("保存成功")
+        router.push("/admin/thali")
+      }
+     } catch (err) { 
+      console.log(err);
+      
+    }
+  }
+  const updateThaliSave = async () => {
+    try {
+      let new_other_benefits = thaliBody.other_benefits.map((item: any) => (item.value))
+      let node_groups = thaliBody.node_group_ids.map((item: any) => ({
+        ...item,
+        is_time_limited: item.is_time_limited ? 1 : 0,
+        is_traffic_limited:item.is_traffic_limited?1:0,
+      }))
+      console.log("更新数据",{...thaliBody, other_benefits: new_other_benefits,node_groups: node_groups});
+      
+      const res = await updateThali({...thaliBody, other_benefits: new_other_benefits,node_groups: node_groups}) as any
+      if (res.code === 200) {
+        toast.success("保存成功")
+        router.push("/admin/thali")
+      }
+     } catch (err) { 
+      console.log(err);
+
+    }
+  }
+  const onSaveThali = () => {
   
+    // 处理发送的数据
+    
+    if (thaliBody.id) {
+      updateThaliSave()
+    } else{ 
+       createThaliSave()
+    }
+    // console.log({...thaliBody, other_benefits: new_other_benefits})
+  }
+  const onLoadBus = () => { 
+    bus.on("saveNodesGroup", (data: any) => {
+        setGroupBody(data)
+    })
+  
+    bus.on("changeGroupValue", (flag: boolean) => { 
+      setStatusMap((prev) => ({ ...prev, group: flag }))
+    })
+    bus.on("saveThali", (data: any) => {
+      setThaliBody(data)
+  })
+    bus.on("changeThaliValue", (flag: boolean) => { 
+      setStatusMap((prev) => ({ ...prev, thali: flag }))
+    })
+  }
+  const onCloseBus = () => {
+    bus.off("saveNodesGroup")
+    bus.off("changeGroupValue")
+    bus.off("saveThali")
+    bus.off("changeThaliValue")
+  }
+    
+  const RightButtonGroup=useMemo<Record<string, react.ReactElement>>(()=>({
+    "/admin":<Button variant="ghost" size="sm" asChild>
+    <Link href="/" className="flex items-center space-x-2">
+      <ArrowLeft className="h-4 w-4" />
+      <span>返回首页</span>
+    </Link>
+  </Button>,
+    "/admin/thali": <Button className="rounded-md w-22 h-8 !bg-[#1677FF]"><Link href={"/admin/generateThali"}>添加套餐</Link></Button>,
+    "/admin/generateThali": <div className="flex gap-2 items-center">
+      <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
+      { statusMap.thali ?<Button onClick={onSaveThali}  className="w-15 h-8 rounded-md !bg-[#1677FF] ">保存</Button>:  <Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>}
+
+    </div>,
+    "/admin/nodes-group": <Button className="rounded-md w-[102px] h-8 !bg-[#1677FF]"><Link href={"/admin/generateNodeGroup/0"}>添加节点组</Link></Button>,
+    "/admin/generateNodeGroup":<div className="flex gap-2 items-center">
+      <Button variant="outline" className="w-15 h-8 rounded-md">取消</Button>
+      { statusMap.group?<Button  className="w-15 h-8 rounded-md !bg-[#1677FF] " onClick={onSaveGroup}>保存</Button>:<Button className="w-15 h-8 rounded-md border border-[#D9D9D9]  !bg-[rgba(0,0,0,0.04)] text-[rgba(0,0,0,0.25)]">保存</Button>}
+    
+    
+    </div>,
+     "/admin/nodes": <Button className="rounded-md w-[88px] h-8 !bg-[#1677FF]"> <Link href="/admin/nodes/modal/0">添加节点</Link></Button>,
+  }),[pathname,statusMap,groupBody,thaliBody]) 
   useEffect(() => {
+    onLoadBus()
     // 检查是否是管理员
     const checkAdmin = () => {
       try {
@@ -236,6 +352,9 @@ export default function AdminLayout({
     };
 
     checkAdmin();
+    return () => { 
+      onCloseBus()
+    }
   }, []);
 
   // 如果未认证为管理员，显示加载状态
@@ -303,7 +422,7 @@ export default function AdminLayout({
             <div className="h-full px-6 flex items-center justify-between">
               <SidebarTrigger />
               <h2 className="text-lg font-medium"></h2>
-              {RightButtonGroup[pathname]}
+              {RightButtonGroup[removeLastPathSegment(pathname)]}
               {/* <Button variant="ghost" size="sm" asChild>
                 <Link href="/" className="flex items-center space-x-2">
                   <ArrowLeft className="h-4 w-4" />

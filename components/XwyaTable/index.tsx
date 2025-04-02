@@ -20,7 +20,7 @@ export type TableColumns<T> = {
   id?: string
   key?: string
   header?: string
-  cell?: React.ReactNode | ((item: T) => React.ReactNode | string) 
+  cell?: React.ReactNode | ((item: T,index:number) => React.ReactNode | string) 
   className?: string
   headCell?: React.ReactNode | (()=> React.ReactNode | string)
 };
@@ -60,14 +60,14 @@ const XwyaTable = <T extends Record<string, any>,>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item:T) => (
+            {data.map((item:T,index:number) => (
               <TableRow key={item[rowKey] as Key} className="last:!border-b">
                 {columns.map((column:TableColumns<T>) => (
                   <TableCell
-                    key={column.id as Key || column.key as Key}
+                    key={column.id as Key || column.key as Key || index as Key}
                     className={column.className}
                   >
-                    {typeof column.cell === 'function'?column.cell(item) : column.cell || String((column.key as string).split('.').reduce((acc, key) => acc && acc[key], item))  }{" "}
+                    {typeof column.cell === 'function'?column.cell(item,index) : column.cell || String((column.key as string).split('.').reduce((acc, key) => acc && acc[key], item))  }{" "}
                   </TableCell>
                 ))}
               </TableRow>

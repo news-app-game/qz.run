@@ -154,6 +154,8 @@ const Modal = () => {
    
   };
   useEffect(() => { 
+    console.log(performance.navigation.type);
+    
     if (params.id != "0") { 
       try { 
         let nodeinfo: any = sessionStorage.getItem(`node-${params.id}`)

@@ -1,19 +1,14 @@
 "use client";
-import React, { useEffect} from "react";
+import React, { useState,useEffect } from "react";
 import NodeGroupTableBox from "@/components/NodeGroupTableBox";
 import { getNodeGroupsList } from "@/api/admin/nodes"
 const NodesGroup =  () => {
-  // try {
-  //   const grouplist = await getNodeGroupsList()
-  //   console.log(grouplist);
-  // } catch (err) { 
-  //   console.log(err);
-    
-  // }
+   const [grouplist,setGrouplist] = useState([])
   const getData = async () => { 
-    const grouplist = await getNodeGroupsList()
-    console.log(grouplist);
-    
+    const res: {code:number,data:any} = await getNodeGroupsList()
+    if (res.code === 200) { 
+      setGrouplist(res.data)
+    }
   }
   useEffect(() => { 
     getData()
@@ -21,10 +16,9 @@ const NodesGroup =  () => {
   
   return (
     <div className="flex gap-4 flex-wrap">
-      {Array.from(
-        { length: 3 }).map((_, index) => (
-          <div className="w-[calc(50%-8px)]" key={index}>
-            <NodeGroupTableBox />
+      {grouplist.map((item: {id:number},index:number) => (
+          <div className="w-[calc(50%-8px)]" key={item.id}>
+          <NodeGroupTableBox row={item as { id: string | number; name: string;nodes:any[] }} />
           </div>
         )
       )}
