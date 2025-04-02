@@ -39,7 +39,13 @@ function PaymentContent() {
               console.log('Type', type);
               console.log('Body', body);
               // 支付成功
-              router.push('/subscription');
+              if (type === 'error' || type === 'fail') {
+                // 刷新当前页面
+                window.location.reload();
+              }
+              if (type === 'success') {
+                router.push('/subscription');
+              }
             },
           });
         }
