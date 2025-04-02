@@ -222,11 +222,11 @@ function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabK
 							))}
 						</ul>
 					</div>
-					{/* {plan.features.others.length > 0 && (
+					{plan.other_benefits.length > 0 && (
 						<div className="flex flex-col gap-2">
 							<div className="text-xs text-muted-foreground">其他</div>
 							<ul className="flex flex-col gap-1">
-								{plan.features.others.map((feature, index) => (
+								{plan.other_benefits.map((feature, index) => (
 									<li key={index} className="flex items-center gap-1 m-0">
 										<CheckCircle size={20} className="text-green-500" weight="fill" />
 										{feature}
@@ -234,7 +234,7 @@ function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabK
 								))}
 							</ul>
 						</div>
-					)} */}
+					)}
 				</div>
 			</CardFooter>
 		</Card>

@@ -31,6 +31,7 @@ declare namespace Packages {
     max_online_devices: number;
     package_node_groups: NodeGroup[];
     user_subscribed: boolean;
+    other_benefits: string[];
   }
   interface SiteConfig {
     annually_discount: number;
