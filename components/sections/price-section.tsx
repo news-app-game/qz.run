@@ -45,15 +45,21 @@ export function PriceSection() {
 	const [siteConfig, setSiteConfig] = useState<Packages.SiteConfig | null>(null)
 	useEffect(() => {
 		const fetchData = async () => {
-			const { data } = await getPackages()
-			setPackages(data.packages)
-			setSiteConfig(data.site_config)
+			try {
+				const { data } = await getPackages()
+				setSiteConfig(data.site_config)
+				setPackages(data.packages)
+				console.log('data.site_config', data.site_config)
+			} catch (error) {
+				console.error('获取套餐数据失败:', error)
+			} finally {
+			}
 		}
 		fetchData()
 	}, [])
-	useEffect(() => {
-		console.log('packages', packages, siteConfig)
-	}, [packages, siteConfig])
+	// useEffect(() => {
+	// 	console.log('packages', packages, siteConfig)
+	// }, [packages, siteConfig])
 
 	return (
 		<Section id="choose-plan">
@@ -97,30 +103,20 @@ export function PriceSection() {
 	)
 }
 
-interface PriceCardProps {
-	plan: {
-		name: string
-		description: string
-		monthlyPrice: number
-		features: {
-			base: string[]
-			route: string[]
-			others: string[]
-		}
-	}
-	billingCycle: BillingCycle
+
+interface PriceCardDataProps {
+	plan: Packages.Item
+	tabKey: BillingCycleKey
+	siteConfig?: Packages.SiteConfig | null
 }
-
-
-function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabKey: BillingCycleKey, siteConfig: Packages.SiteConfig | null }) {
+function PriceCardData({ plan, tabKey, siteConfig }: PriceCardDataProps) {
 	const router = useRouter()
 	const price = useMemo(() => {
 		return plan[tabKey.valueKey] as string
 	}, [plan, tabKey])
-
-	useEffect(() => {
-		console.log('tabKey', tabKey, siteConfig)
-	}, [tabKey, siteConfig])
+	// useEffect(() => {
+	// 	console.log('plan siteConfig', siteConfig)
+	// }, [plan, tabKey, siteConfig])
 
 	// 单位 0对应天 1对应周 2对应月
 	const getUnit = (unit: 0 | 1 | 2) => {
@@ -207,7 +203,7 @@ function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabK
 							{plan.package_node_groups.map((group) => (
 								<li key={group.id} className="flex items-center gap-1 m-0">
 									<CheckCircle size={20} className="text-green-500" weight="fill" />
-									{group.node_group.name}线路
+									{group.node_group?.name}线路
 									{
 										group.time_limit && (
 											<span className="text-xs text-muted-foreground">（每{getUnit(group.time_period)}{group.time_limit}小时）</span>
@@ -222,7 +218,7 @@ function PriceCardData({ plan, tabKey, siteConfig }: { plan: Packages.Item, tabK
 							))}
 						</ul>
 					</div>
-					{plan.other_benefits.length > 0 && (
+					{plan.other_benefits?.length > 0 && (
 						<div className="flex flex-col gap-2">
 							<div className="text-xs text-muted-foreground">其他</div>
 							<ul className="flex flex-col gap-1">
