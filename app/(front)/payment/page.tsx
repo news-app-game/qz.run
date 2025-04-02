@@ -4,7 +4,8 @@ import Script from 'next/script';
 import { useSearchParams } from 'next/navigation';
 import { orderPayment } from '@/api/order';
 import { useRouter } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import { Loader2 } from "lucide-react"
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ declare global {
         id: string;
         checkoutId: string;
         onResponse: (type: string, body: any) => void;
+        onLoad: () => void;
       }) => void;
     };
   }
@@ -23,8 +25,10 @@ function PaymentContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const period = searchParams.get('period');
+  const [pageLoading, setPageLoading] = useState(true);
   const loadSumUpCard = async () => {
     try {
+      setPageLoading(true);
       const { code, data } = await orderPayment({
         package_id: Number(id),
         period: period as 'monthly' | 'quarterly' | 'semi_annually' | 'annually',
@@ -47,16 +51,27 @@ function PaymentContent() {
                 router.push('/subscription');
               }
             },
+            // 挂载成功
+            onLoad: () => {
+              setPageLoading(false);
+            }
           });
         }
       }
     } catch (error) {
       console.log('error', error);
+      setPageLoading(false);
     }
   }
 
   return (
     <>
+      {pageLoading && (
+        <div className='flex justify-center items-center h-screen gap-2'>
+          <Loader2 className='animate-spin' />
+          加载中
+        </div>
+      )}
       <div id="sumup-card"></div>
       <Script
         id="sumup-sdk"
