@@ -190,7 +190,7 @@ const Modal = () => {
         </DialogHeader>
         <XwyaForm items={items} form={form} onFinish={onFinish}>
           <div className="flex justify-end gap-2 w-full mt-4">
-            <Button variant="outline">取消</Button>
+            <Button variant="outline" onClick={() => onClose(false)}>取消</Button>
             <Button className="!bg-[#1677FF]" type="submit" >
                {params.id === "0" ? "添加" : "保存"}
             </Button>
