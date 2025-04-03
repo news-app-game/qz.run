@@ -8,16 +8,23 @@ import { DataTable } from "./table";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { getOrderList } from "@/api/order";
+import dayjs from "dayjs";
 export default function SubscriptionCard({ className }: { className?: string }) {
   const router = useRouter()
   const columns = [
     {
       header: "账单日期",
       accessorKey: "date",
+      cell: ({ row }: { row: any }) => {
+        return <span className="text-[#020618]">{dayjs(row.original.created_at).format('YYYY-MM-DD')}</span>
+      }
     },
     {
       header: "金额",
-      accessorKey: "amount",
+      accessorKey: "price",
+      cell: ({ row }: { row: any }) => {
+        return <span className="text-[#020618]">{row.original.price}￡</span>
+      }
     },
     {
       header: "状态",
@@ -26,14 +33,12 @@ export default function SubscriptionCard({ className }: { className?: string }) 
         const status = row.original.status;
         let variant: string = "";
         // 1 已支付 2 待支付 3 已取消
-        if (status === "1") {
-          variant = "text-[#00CB00] bg-[#F1FFE9] border-1 border-[#92EF74] shadow-none hover:bg-[#F1FFE9]";
-        } else if (status === "2") {
-          variant = "text-[#FF9800] bg-[#FFF4E6] border-1 border-[#FF9800] shadow-none hover:bg-[#FFF4E6]";
+        if (status === "已支付") {
+          variant = "text-[#00CB00] bg-[#F1FFE9] rounded-[4px] border-1 border-[#92EF74] shadow-none hover:bg-[#F1FFE9]";
         } else if (status === "3") {
           variant = "text-[#FF0000] bg-[#FFE6E6] border-1 border-[#FF0000] shadow-none hover:bg-[#FFE6E6]";
         }
-        const statusText = status === "1" ? "已支付" : status === "2" ? "待支付" : "已取消";
+        const statusText = status;
 
         return <Badge className={cn(variant)}>{statusText}</Badge>
       }
@@ -41,12 +46,20 @@ export default function SubscriptionCard({ className }: { className?: string }) 
     {
       header: '套餐',
       accessorKey: 'package',
+      cell: ({ row }: { row: any }) => {
+        return <span className="text-[#020618]">{row.original.package_name}</span>
+      }
     },
     {
       header: '购买时长',
       accessorKey: 'duration',
+      cell: ({ row }: { row: any }) => {
+        return <span className="text-[#020618]">{row.original.payment_month}个月</span>
+      }
     },
   ]
+
+  const [info, setInfo] = useState<any>(null)
   const [data, setData] = useState<any[]>([])
   const [pageSize, setPageSize] = useState<number>(20)
   const [total, setTotal] = useState<number>(0)
@@ -54,22 +67,33 @@ export default function SubscriptionCard({ className }: { className?: string }) 
   const [loading, setLoading] = useState<boolean>(false)
   useEffect(() => {
     getList(currentPage)
-  }, [])
+  }, [currentPage])
   const getList = async (page: number) => {
     try {
       setLoading(true)
       const res = await getOrderList(page)
-      const { data, total, per_page, current_page } = res.data.orders
-      setPageSize(per_page)
+      const { data, meta } = res.data.orders
+      const user_package = res.data.user_package
+      setInfo(user_package)
+      setPageSize(meta.per_page)
       setData(data)
-      setTotal(total)
-      setCurrentPage(current_page)
+      setTotal(meta.total)
+      setCurrentPage(meta.current_page)
     } catch (error) {
       console.log('error', error)
     } finally {
       setLoading(false)
     }
 
+  }
+  // 渲染日期单位
+  const renderDateUnit = (date: 'quarterly' | 'monthly' | 'annually') => {
+    const map = {
+      quarterly: '季',
+      monthly: '月',
+      annually: '年',
+    }
+    return map[date]
   }
   return <Card className={cn(className)}>
     <CardHeader className="flex flex-row items-center justify-center">
@@ -80,16 +104,23 @@ export default function SubscriptionCard({ className }: { className?: string }) 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col text-[#020618] gap-4">
           <p className="font-[500]">套餐</p>
-          <div className="flex items-center justify-start gap-2.5">
-            <div className="font-[400]">当前套餐：普通套餐，<span className="font-[600]">7.92￡</span>/季</div>
-            <Button size="sm" onClick={() => {
-              router.push('/#choose-plan')
-            }}>更改套餐</Button>
-          </div>
-          <div className="flex items-center justify-start gap-2.5">
-            <div className="font-[400]">您的套餐将于:  <span className="font-[600]">2025-03-01</span>/失效</div>
-            <Button size="sm" variant="outline">续订</Button>
-          </div>
+          {
+            info && (
+              <>
+                <div className="flex items-center justify-start gap-2.5">
+                  <div className="font-[400]">当前套餐：{info.name}，<span className="font-[600]">{info.price}￡</span>/{renderDateUnit(info.current_period)}</div>
+                </div>
+                <div className="flex items-center justify-start gap-2.5">
+                  <div className="font-[400]">您的套餐将于:  <span className="font-[600]">{dayjs(info.ended_at).format('YYYY-MM-DD')}</span>/失效</div>
+                  <Button size="sm" variant="outline" onClick={() => {
+                    const package_id = info.package_id || 2
+                    const period = info.current_period
+                    router.push(`/payment?package_id=${package_id}&period=${period}`)
+                  }}>续订</Button>
+                </div>
+              </>
+            )
+          }
         </div>
       </div>
 

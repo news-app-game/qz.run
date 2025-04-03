@@ -51,20 +51,19 @@ export function DataTable<TData, TValue>({
 
   const totalPages = useMemo(() => {
     const totalPage = Math.ceil(total / pageSize)
-    console.log('totalPage', totalPage, total, pageSize)
     return totalPage
   }, [total, pageSize])
 
   return (
     <div className="flex flex-col w-full">
-      <div className="rounded-md border">
+      <div className="rounded-md">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-[#00000005]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="font-[500] text-[#000000E0]">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -78,16 +77,6 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {/* 是否在加载中 */}
-            {loading && (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  <div className="flex items-center justify-center">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -105,6 +94,16 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   暂无数据
+                </TableCell>
+              </TableRow>
+            )}
+            {/* 是否在加载中 */}
+            {loading && (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </div>
                 </TableCell>
               </TableRow>
             )}

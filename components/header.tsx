@@ -48,7 +48,7 @@ export default function Header({ logined }: { logined: boolean }) {
     window.location.reload();
   };
   return (
-    <header className="sticky top-0 bg-white border-b">
+    <header className="sticky top-0 bg-white border-b z-10">
       <div className="max-w-[1024px] mx-auto px-6 h-16 flex">
         <Link href="/" className="flex-1 flex items-center gap-3 lg:mr-6">
           <Image src="/logo.png" alt="logo" width={32} className="select-none" height={32} />
