@@ -32,7 +32,7 @@ const Thali = () => {
   const [thaliList, setThaliList] = useState<ThaliBoxContent[]>([])
   const getData = async () => { 
     try { 
-    const res = await getThaliList() as any
+      const res = await getThaliList < {code:number,data:Thali.RootData<FormBody>}>() 
     if (res.code === 200) { 
       let data =  res.data.packages.reduce((prev:any, item:any) => {
         let globalFlag = !!item.is_time_limited || !!item.is_traffic_limited
@@ -77,17 +77,15 @@ const Thali = () => {
 
         return prev
       }, [])
-      
        setThaliList(data)
       setFormBody(res.data.site_config)
-      
     }} catch (err) {
       console.error(err)
     }
   }
   const sendFormBody = async () => { 
     try { 
-      const res = await setDiscount(formBody) as any
+      const res = await setDiscount<FormBody>(formBody) as {code:number}
       if (res.code === 200) { 
         toast.success("保存成功")
       }
@@ -107,7 +105,7 @@ const Thali = () => {
       <div className=' text-base font-bold'>套餐节点</div>
       <div className='mt-[10px] flex flex-wrap gap-4'>
         {thaliList.map((item, index) => (
-          <ThaliBox key={index} title={item.title} id={item.id} content={item.content as Content[]} />
+          <ThaliBox key={index} title={item.title} id={item.id} content={item.content} />
         ))}
   
       </div>
@@ -123,7 +121,6 @@ const Thali = () => {
           <Button className="w-15 h-8 rounded-md !bg-[#1677FF]" onClick={ sendFormBody}>保存</Button>
           <Button variant="outline" className="w-15 h-8 rounded-md"  onClick={() => window.location.reload()} >取消</Button>
           </div>
-          
         </div>
     </div>
   )

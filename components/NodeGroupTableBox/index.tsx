@@ -79,7 +79,7 @@ const columns: TableColumns<Node>[] = [
 interface NodeGroupTableBoxProps<T> {
   row: T ;
 }
-const NodeGroupTableBox = <T extends { id: string | number; name: string;nodes:any[] },>(props: NodeGroupTableBoxProps<T>) => {
+const NodeGroupTableBox = <T extends Record<string,any>>(props: NodeGroupTableBoxProps<T>) => {
   
   return (
     <div className="border border-[#F0F0F0] rounded-lg">

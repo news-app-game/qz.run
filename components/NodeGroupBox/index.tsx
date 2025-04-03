@@ -30,14 +30,14 @@ const globalLimitItems: LimitSwitchData<string>[] = [
     valueKey: "traffic_limit",
   },
 ];
-const NodeGroupBox = ({ row,index,onChange}:any) => {
+const NodeGroupBox = ({ row,index,onChange,onDelete}:any) => {
   return (
     <div className="border border-[#F0F0F0] rounded-lg">
       <div className="flex justify-between items-center px-5 py-[15px] border-b border-[#f0f0f0]">
         <div>{ row.name}</div>
         <AlertDialog >
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="w-15 h-8 rounded-md">
+            <Button variant="outline" className="w-15 h-8 rounded-md" >
               移除
             </Button>
           </AlertDialogTrigger>
@@ -49,7 +49,7 @@ const NodeGroupBox = ({ row,index,onChange}:any) => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="w-15 h-8">取消</AlertDialogCancel>
-              <AlertDialogAction className="bg-[#FF3B30] hover:bg-[#FF3B30] text-white w-15 h-8">移除</AlertDialogAction>
+              <AlertDialogAction className="bg-[#FF3B30] hover:bg-[#FF3B30] text-white w-15 h-8" onClick={()=>onDelete(row.id)}>移除</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

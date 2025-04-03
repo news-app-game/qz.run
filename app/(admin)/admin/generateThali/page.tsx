@@ -8,9 +8,21 @@ import NodeGroupBox from "@/components/NodeGroupBox";
 import AddNodeGroupDrawer from "@/components/AddNodeGroupDrawer";
 import bus from "@/tools/eventBus";
 import { useSearchParams } from "next/navigation";
-import { getThaliInfo } from "@/api/admin/thali";
-import {toast} from "sonner"
-
+import { getThaliInfo,deleteThali } from "@/api/admin/thali";
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {useRouter } from "next/navigation";
 const baseItems: Record<string, any>[] = [
   { label: "名称", key: "name" },
   { label: "描述", key: "description" },
@@ -28,7 +40,7 @@ class Package {
   traffic_period: string = "0"; // 流量周期（如 1 代表按天, 2 代表按月）
   max_online_devices: string = ""; // 最大同时在线设备数
   other_benefits: any[] = []; // 其他福利
-  node_group_ids: any[] = []; // 关联的节点组 ID
+  node_groups: any[] = []; // 关联的节点组 ID
 }
 
 let defaultValue = new Package();
@@ -51,39 +63,37 @@ const globalLimitItems: LimitSwitchData<string>[] = [
 
 const GenerateThali = () => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [formBody, setFormBody] = useState<Record<string, any>>(new Package());
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false)
   const hasChanged = useMemo(() => {
-    console.log(formBody,defaultValue);
-    
     return JSON.stringify(formBody) !== JSON.stringify(defaultValue);
   }, [formBody]);
   const onChangeValue = (key: string, value: any) => {
-    console.log(key, value);
-
     setFormBody((prev) => ({ ...prev, [key]: value }));
   };
   const onChangeGroupValue = (index: number, key: string, value: any) => {
     setFormBody((prev) => {
       const newFormBody = { ...prev };
-      newFormBody.node_group_ids[index][key] = value;
+      newFormBody.node_groups[index][key] = value;
       return newFormBody;
     });
   };
   const onPushGroup = (value: any) => {
-    if (formBody.node_group_ids.find((item: any) => item.id === value.id)) {
+    if (formBody.node_groups.find((item: any) => item.id === value.id)) {
       toast.error("节点组已经添加");
       return;
     }
     setFormBody((prev) => {
       const newFormBody = { ...prev };
-      newFormBody.node_group_ids.push(value);
+      newFormBody.node_groups.push(value);
       return newFormBody;
     });
   };
   const onRemoveGroup = (id: any) => {
     setFormBody((prev) => {
       const newFormBody = { ...prev };
-      newFormBody.node_group_ids = newFormBody.node_group_ids.filter(
+      newFormBody.node_groups = newFormBody.node_groups.filter(
         (item: any) => item.id !== id
       );
       return newFormBody;
@@ -108,9 +118,10 @@ const GenerateThali = () => {
       const res = await getThaliInfo(searchParams.get("id")) as any 
       if (res.code === 200) { 
         
-        res.data.node_group_ids = res.data.package_node_groups.map((item: any) => {
+        res.data.node_groups = res.data.package_node_groups.map((item: any) => {
           return {
             ...item,
+            id:item.node_group?.id,
             is_time_limited: !!item.is_time_limited,
             is_traffic_limited: !!item.is_traffic_limited,
             time_period: item.time_period != null?"0" : item.time_period.toString(),
@@ -128,8 +139,22 @@ const GenerateThali = () => {
       console.log(err);
       
     }
-    
   } 
+  const onOpenChange = (flag: boolean) => { 
+    setDeleteOpen(flag)
+  }
+  const onDeleteThali = async () => { 
+    try { 
+      const res = await deleteThali(searchParams.get("id")) as any
+      if (res.code === 200) { 
+        toast.success("删除成功")
+        router.push("/admin/thali")
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(`删除失败:${JSON.stringify(err)}`)
+     }
+  }
   useEffect(() => { 
       if ( searchParams.get("id")) { 
         getLoadDefautlValue()
@@ -153,7 +178,7 @@ const GenerateThali = () => {
               <Label htmlFor={item.key}>{item.label}</Label>
               <Input
                 id={item.key}
-                type="text"
+                type={ item.key!="monthly_price"?'text':'number'}
                 value={formBody[item.key]}
                 onChange={(e) => onChangeValue(item.key, e.target.value)}
                 placeholder={item.label}
@@ -187,13 +212,14 @@ const GenerateThali = () => {
         </div>
         <div>
           <div className="flex gap-4 my-[10px] flex-wrap">
-            {formBody.node_group_ids.map((item:any, index:number) => (
+            {formBody.node_groups.map((item:any, index:number) => (
               <div
                 className="w-[calc(50%-8px)] max-md:w-full"
                 key={item.id || index}
               >
                 <NodeGroupBox
                   onChange={onChangeGroupValue}
+                  onDelete={ onRemoveGroup}
                   row={item}
                   index={index}
                 />
@@ -217,7 +243,7 @@ const GenerateThali = () => {
           <Label htmlFor="num">数量（台）</Label>
           <Input
             id="num"
-            type="text"
+            type="number"
             value={formBody.max_online_devices}
             onChange={(e) =>
               onChangeValue("max_online_devices", e.target.value)
@@ -256,6 +282,24 @@ const GenerateThali = () => {
           </div>
         </div>
       </div>
+      
+      {searchParams.get("id")  && <div className="mt-8" ><Button className="bg-[#FF3B30] hover:bg-[#FF3B30] text-white w-[102px] h-8" onClick={() => setDeleteOpen(true)}>删除套餐</Button> </div>}
+         <AlertDialog open={deleteOpen} onOpenChange={onOpenChange}>
+              <AlertDialogTrigger asChild>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="lg:w-[412px]">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确定删除套餐？</AlertDialogTitle>
+                  <AlertDialogDescription></AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="w-15 h-8">取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={onDeleteThali} className="bg-[#FF3B30] hover:bg-[#FF3B30] text-white w-15 h-8">
+                    移除
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
     </div>
   );
 };

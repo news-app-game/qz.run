@@ -145,13 +145,11 @@ const Modal = () => {
     }
   }
   const onFinish = async (values: NodeFormBody) => {
-  
     if (params.id === "0") {
       create(values)
     } else { 
       update(values)
     }
-   
   };
   useEffect(() => { 
     console.log(performance.navigation.type);
@@ -185,7 +183,6 @@ const Modal = () => {
   },[])
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      {/* <DialogTrigger>Open</DialogTrigger> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{params.id === "0" ? "添加节点" : "编辑节点"}</DialogTitle>

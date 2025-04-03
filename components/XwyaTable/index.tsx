@@ -48,8 +48,8 @@ const XwyaTable = <T extends Record<string, any>,>({
 }: XwyaTableProps<T>) => {
   return (
     <div className={className}>
-      <div className="  flex-1">
-        <Table className=" h-full   w-full">
+      <div className=" flex-1">
+        <Table className=" min-h-60 h-full  w-full">
           <TableHeader className="bg-[rgba(0,0,0,0.02)]">
             <TableRow>
               {columns.map((item:TableColumns<T>,index:number) => (
@@ -85,7 +85,7 @@ const XwyaTable = <T extends Record<string, any>,>({
             )}
             {loading && (
               <TableRow>
-                <TableCell className=" absolute inset-0 flex justify-center bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(0,0,0,.3)] items-center  z-20">
+                <TableCell className=" absolute inset-0  flex justify-center bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(0,0,0,.3)] items-center  z-20">
                   正在加载...
                 </TableCell>
               </TableRow>

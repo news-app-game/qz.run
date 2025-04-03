@@ -195,7 +195,7 @@ const newItems: SidebarItem[] = [
   },
 ];
 
-
+let numberKey = ["max_online_devices", "monthly_price", "time_limit", "traffic_limit", "time_period", "traffic_period"];
 
 
 export default function AdminLayout({
@@ -208,7 +208,7 @@ export default function AdminLayout({
     group: false,
     thali:false
   });
-  const [groupBody, setGroupBody] = useState<Record<string, any>>({})
+  const [groupBody, setGroupBody] = useState<NodeGroup.NodeGroupRequestBody>()
   const [thaliBody, setThaliBody] = useState<Record<string, any>>({});
   const pathname = usePathname();
   const router  = useRouter()
@@ -234,7 +234,7 @@ export default function AdminLayout({
   }
   const updateNodeGroupSave = async () => {
     try {
-      const res: {code:number} = await updateNodeGroup(groupBody as { id: string | number })
+      const res = await updateNodeGroup<{code:number},Required<NodeGroup.NodeGroupRequestBody>>(groupBody as Required<NodeGroup.NodeGroupRequestBody>)
       if (res.code === 200) { 
         toast.success("保存成功")
         router.push("/admin/nodes-group")
@@ -245,17 +245,25 @@ export default function AdminLayout({
     }
   }
   const onSaveGroup = () => {
-    if (groupBody.id) {
+    if (!groupBody.name) { 
+      toast.error("节点组名称不能为空")
+      return
+    }
+    if (!groupBody.nodes.length) {
+      toast.error("节点组节点不能为空")
+      return
+    }
+    if (groupBody?.id) {
       updateNodeGroupSave()
     } else { 
       createNodeGroupSave()
     }
   }
-  const createThaliSave = async () => {
+  const createThaliSave = async (body:any) => {
     try {
-      let new_other_benefits = thaliBody.other_benefits.map((item: any) => (item.value))
-      let new_node_group_ids = thaliBody.node_group_ids.map((item: any) => (item.id))
-      const res = await createThali({...thaliBody, other_benefits: new_other_benefits, node_group_ids: new_node_group_ids}) as any
+    
+      // let new_node_group_ids = thaliBody.node_group_ids.map((item: any) => (item.id))
+      const res = await createThali(body) as any
       if (res.code === 200) {
         toast.success("保存成功")
         router.push("/admin/thali")
@@ -265,17 +273,11 @@ export default function AdminLayout({
       
     }
   }
-  const updateThaliSave = async () => {
+  const updateThaliSave = async (body:any) => {
     try {
-      let new_other_benefits = thaliBody.other_benefits.map((item: any) => (item.value))
-      let node_groups = thaliBody.node_group_ids.map((item: any) => ({
-        ...item,
-        is_time_limited: item.is_time_limited ? 1 : 0,
-        is_traffic_limited:item.is_traffic_limited?1:0,
-      }))
-      console.log("更新数据",{...thaliBody, other_benefits: new_other_benefits,node_groups: node_groups});
-      
-      const res = await updateThali({...thaliBody, other_benefits: new_other_benefits,node_groups: node_groups}) as any
+
+      // console.log("更新数据",{...thaliBody, other_benefits: new_other_benefits,node_groups: node_groups});
+      const res = await updateThali(body) as any
       if (res.code === 200) {
         toast.success("保存成功")
         router.push("/admin/thali")
@@ -286,13 +288,38 @@ export default function AdminLayout({
     }
   }
   const onSaveThali = () => {
-  
-    // 处理发送的数据
+    let requestBody = {...thaliBody}
+    requestBody.other_benefits = requestBody.other_benefits.map((item: any) => (item.value)).filter(Boolean)
+    requestBody.node_groups = requestBody.node_groups.map((item: any) => { 
+      for (const key in item) { 
+        if (numberKey.includes(key)) { 
+          item[key] = Number(item[key])
+        }
+      }
+      item.is_time_limited = item.is_time_limited ? 1 : 0
+      item.is_traffic_limited = item.is_traffic_limited ? 1 : 0
+      delete item.nodes
+      delete item.name
+      return item
+    })
     
+    requestBody.is_time_limited = requestBody.is_time_limited ? 1 : 0
+    requestBody.is_traffic_limited = requestBody.is_traffic_limited ? 1 : 0
+    
+    for (const key in requestBody) { 
+      if (numberKey.includes(key)) { 
+        requestBody[key] = Number(requestBody[key])
+      }
+    } 
+    console.log(requestBody);
+    if (!requestBody.name) { 
+      toast.error("套餐名称不能为空")
+      return
+    }
     if (thaliBody.id) {
-      updateThaliSave()
+      updateThaliSave(requestBody)
     } else{ 
-       createThaliSave()
+       createThaliSave(requestBody)
     }
     // console.log({...thaliBody, other_benefits: new_other_benefits})
   }

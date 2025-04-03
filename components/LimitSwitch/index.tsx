@@ -100,7 +100,7 @@ const LimitSwitch = <T,>(props: LimitSwitchProps<T>) => {
          </Popover>
        </div>
        <div className="flex items-center space-x-2">
-         <Input className="w-10 h-6" value={data[item.valueKey]} onChange={(e) => {
+         <Input className="w-10 h-6" value={data[item.valueKey]}  onChange={(e) => {
            onChange(item.valueKey as string, e.target.value);
          }} />
          <span className="shrink-0 text-sm">{ item.uint}</span>
