@@ -31,16 +31,17 @@ export default function SubscriptionCard({ className }: { className?: string }) 
       accessorKey: "status",
       cell: ({ row }: { row: any }) => {
         const status = row.original.status;
+        const commonClass: string = "rounded-[4px] border-1 shadow-none";
         let variant: string = "";
         // 1 已支付 2 待支付 3 已取消
         if (status === "已支付") {
-          variant = "text-[#00CB00] bg-[#F1FFE9] rounded-[4px] border-1 border-[#92EF74] shadow-none hover:bg-[#F1FFE9]";
-        } else if (status === "3") {
-          variant = "text-[#FF0000] bg-[#FFE6E6] border-1 border-[#FF0000] shadow-none hover:bg-[#FFE6E6]";
+          variant = "text-[#00CB00] bg-[#F1FFE9] border-[#92EF74] hover:bg-[#F1FFE9]";
+        } else {
+          variant = "text-[#F5222D] bg-[#FFEFF0] border-[#FF9898] hover:bg-[#FFEFF0]";
         }
         const statusText = status;
 
-        return <Badge className={cn(variant)}>{statusText}</Badge>
+        return <Badge className={cn(commonClass, variant)}>{statusText}</Badge>
       }
     },
     {
@@ -66,9 +67,9 @@ export default function SubscriptionCard({ className }: { className?: string }) 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [loading, setLoading] = useState<boolean>(false)
   useEffect(() => {
-    getList(currentPage)
-  }, [currentPage])
-  const getList = async (page: number) => {
+    getList()
+  }, [])
+  const getList = async (page: number = currentPage) => {
     try {
       setLoading(true)
       const res = await getOrderList(page)
