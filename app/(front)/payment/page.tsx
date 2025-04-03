@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { useSearchParams } from 'next/navigation';
 import { orderPayment } from '@/api/order';
 import { useRouter } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from "lucide-react"
 
 declare global {
@@ -26,7 +26,24 @@ function PaymentContent() {
   const id = searchParams.get('id');
   const period = searchParams.get('period');
   const [pageLoading, setPageLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      setMounted(false);
+      setPageLoading(true);
+      // 清理 SumUpCard 实例
+      const sumupCardElement = document.getElementById('sumup-card');
+      if (sumupCardElement) {
+        sumupCardElement.innerHTML = '';
+      }
+    };
+  }, []);
+
   const loadSumUpCard = async () => {
+    if (!mounted) return;
+    
     try {
       setPageLoading(true);
       const { code, data } = await orderPayment({
@@ -64,6 +81,12 @@ function PaymentContent() {
     }
   }
 
+  useEffect(() => {
+    if (mounted) {
+      loadSumUpCard();
+    }
+  }, [mounted]);
+
   return (
     <>
       {pageLoading && (
@@ -78,7 +101,9 @@ function PaymentContent() {
         type="text/javascript"
         src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
         onLoad={() => {
-          loadSumUpCard();
+          if (mounted) {
+            loadSumUpCard();
+          }
         }}
       />
     </>
