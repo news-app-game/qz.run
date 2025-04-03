@@ -245,11 +245,11 @@ export default function AdminLayout({
     }
   }
   const onSaveGroup = () => {
-    if (!groupBody.name) { 
+    if (!groupBody?.name) { 
       toast.error("节点组名称不能为空")
       return
     }
-    if (!groupBody.nodes.length) {
+    if (!groupBody?.nodes.length) {
       toast.error("节点组节点不能为空")
       return
     }
