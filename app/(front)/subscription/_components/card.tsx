@@ -114,9 +114,9 @@ export default function SubscriptionCard({ className }: { className?: string }) 
                 <div className="flex items-center justify-start gap-2.5">
                   <div className="font-[400]">您的套餐将于:  <span className="font-[600]">{dayjs(info.ended_at).format('YYYY-MM-DD')}</span>/失效</div>
                   <Button size="sm" variant="outline" onClick={() => {
-                    const package_id = info.package_id || 2
+                    const package_id = info.package_id
                     const period = info.current_period
-                    router.push(`/payment?package_id=${package_id}&period=${period}`)
+                    router.push(`/payment?id=${package_id}&period=${period}`)
                   }}>续订</Button>
                 </div>
               </>
