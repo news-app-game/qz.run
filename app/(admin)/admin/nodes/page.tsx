@@ -1,225 +1,227 @@
-'use client';
-
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { adminFetch } from '../utils/fetch';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+"use client";
+import React, { useState,useMemo,useEffect } from 'react'
+import XwyaTable, { TableColumns} from "@/components/XwyaTable"
+import usePage, { PageType} from '@/hooks/use-page';
+import { Search } from "lucide-react";
+import Link from 'next/link';
+import { getNodesList,deleteNode } from '@/api/admin/nodes';
+import { cn } from '@/lib/utils';
+import { formatDate } from '@/tools/day';
+import bus from '@/tools/eventBus';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { ArrowDown, ArrowUp } from 'lucide-react';
-
-interface Node {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+interface NodeLocation {
   id: number;
   name: string;
-  // 在线人数
-  online_users_count: number;
-  // 总流量数
-  total_traffic_count: string;
-  // 上行流量（30min）
-  average_upstream_traffic: string;
-  // 下行流量（30min）
-  average_downstream_traffic: string;
+  flag: string;
+  status: number;
   created_at: string;
-  url: string;
+}
+
+interface Node  {
+  id: number;
+  name: string;
+  average_downstream_traffic: string;
+  average_upstream_traffic: string;
+  connect_type: number;
+  created_at: string;
+  node_loc: NodeLocation;
+  online_users_count: number;
+  remark: string | null;
   status: boolean;
+  total_traffic_count: string;
+  url: string;
 }
-
-interface PaginationMeta {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-}
-
-interface ApiResponse {
-  nodes: Node[];
-  meta: PaginationMeta;
-}
-
-export default function NodeManagement() {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [meta, setMeta] = useState<PaginationMeta>({
-    current_page: 1,
-    per_page: 50,
-    total: 0,
-    last_page: 1
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
-  useEffect(() => {
-    fetchNodes(meta.current_page);
-  }, []);
-  
-  const fetchNodes = async (page: number) => {
-    try {
-      const response = await adminFetch<ApiResponse>(`/admin/nodes?page=${page}&per_page=${meta.per_page}`);
-      setNodes(response.nodes || []);
-      setMeta(response.meta);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : '获取节点列表失败');
-      setLoading(false);
-    }
-  };
-  
-  const handlePageChange = (page: number) => {
-    setLoading(true);
-    fetchNodes(page);
-  };
-  
-  const toggleNodeStatus = async (nodeId: number, currentStatus: boolean) => {
-    try {
-      await adminFetch(`/admin/nodes/${nodeId}/status`, {
-        method: 'PUT',
-        body: JSON.stringify({status: !currentStatus}),
-      });
-      // 重新获取节点列表以更新状态
-      fetchNodes(meta.current_page);
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : '更新节点状态失败');
-    }
-  };
-  
-  const getNodeStatus = (status: boolean) => {
-    switch (status) {
-      case true:
-        return {label: '正常', variant: 'default' as const};
-      case false:
-        return {label: '维护中', variant: 'secondary' as const};
-    }
-  };
-  
-  if (loading) {
-    return <div className="flex items-center justify-center min-h-[200px]">加载中...</div>;
+interface NodeListApi {
+  code: number,
+  data: {
+    meta: {
+      total: number,
+      current_page: number,
+      per_page: number,
+      last_page: number,
+    },
+    nodes: Node[]
   }
-  
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-  
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">节点管理</h1>
-        <div className="text-sm text-muted-foreground">
-          共 {meta.total} 个节点
+}
+
+const Nodes = () => {
+  const router = useRouter()
+  const { data, page, total, setTotal, loading, setLoading, setData, setPage } = usePage<Node>()
+  const [open, setOpen] = useState<boolean>(false)
+  const [deleteNodeRow, setDeleteNodeRow] = useState<Node | null>(null)
+  const columns:TableColumns<Node>[] =[
+    {
+      key: "name",
+      header: "节点名",
+      headCell: () => (
+        <div className="w-full  flex items-center justify-between ">
+          <div>节点名</div>
+          <Search width={12} height={12} className="text-[rgba(0,0,0,0.25)]" />
         </div>
-      </div>
-      
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead className="min-w-[80px]">名称</TableHead>
-              <TableHead>地址</TableHead>
-              <TableHead className="min-w-[80px]">状态</TableHead>
-              <TableHead className="min-w-[100px]">在线人数</TableHead>
-              <TableHead className="min-w-[100px]">总流量数</TableHead>
-              <TableHead className="min-w-[160px]">上下行流量（30min）</TableHead>
-              <TableHead className="min-w-[160px]">创建时间</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {nodes.map((node) => (
-              <TableRow key={`row-${node.id}`}>
-                <TableCell>{node.id}</TableCell>
-                <TableCell>{node.name}</TableCell>
-                <TableCell>{node.url}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={getNodeStatus(node.status).variant}
-                    className="cursor-pointer hover:opacity-80"
-                    onClick={() => toggleNodeStatus(node.id, node.status)}
-                  >
-                    {getNodeStatus(node.status).label}
-                  </Badge>
-                </TableCell>
-                <TableCell>{node.online_users_count || '-'}</TableCell>
-                <TableCell>{node.total_traffic_count || '-'}</TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <ArrowUp size='16'/>
-                    <span>{node.average_upstream_traffic || '---'}</span>
-                    <span className="px-2"></span>
-                    <ArrowDown size='16'/>
-                    <span>{node.average_downstream_traffic || '---'}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {new Date(node.created_at).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      
-      <Pagination>
-        <PaginationContent>
-          {meta.current_page > 1 && (
-            <PaginationItem key="prev">
-              <PaginationPrevious
-                onClick={() => handlePageChange(meta.current_page - 1)}
-                className="cursor-pointer"
-                size="sm"
-              />
-            </PaginationItem>
-          )}
-          
-          {Array.from({length: meta.last_page}, (_, i) => i + 1)
-            .filter(page => {
-              const nearCurrent = Math.abs(page - meta.current_page) <= 1;
-              const isFirstOrLast = page === 1 || page === meta.last_page;
-              return nearCurrent || isFirstOrLast;
-            })
-            .map((page, index, array) => {
-              const items = [];
-              
-              if (index > 0 && array[index - 1] !== page - 1) {
-                items.push(
-                  <PaginationItem key={`ellipsis-${page}`}>
-                    <span className="px-2">...</span>
-                  </PaginationItem>
-                );
-              }
-              
-              items.push(
-                <PaginationItem key={`page-${page}`}>
-                  <PaginationLink
-                    onClick={() => handlePageChange(page)}
-                    isActive={meta.current_page === page}
-                    size="sm"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-              
-              return items;
-            }).flat()}
-          
-          {meta.current_page < meta.last_page && (
-            <PaginationItem key="next">
-              <PaginationNext
-                onClick={() => handlePageChange(meta.current_page + 1)}
-                className="cursor-pointer"
-                size="sm"
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
+      )
+    },
+    {
+      key: "node_loc.name",
+      header: "区域",
+      headCell: () => (
+        <div className='w-full flex justify-between items-center'>
+          <span>区域</span>
+          <img src="/FilterFilled.svg" alt="" />
+        </div>
+      ),
+    },
+    {
+      key: "remark",  header: "节点类型",
+      headCell: () => (
+        <div className='w-full flex justify-between items-center'>
+          <span>节点类型</span>
+          <img src="/FilterFilled.svg" alt="" />
+        </div>
+      ),
+   
+     },
+  {
+    key: "connect_type",
+    header: "套了CF",
+    cell: (row: Node) => (<div>{ row.connect_type===1?"是":"否" }</div>)
+     },
+    {
+      key: "status",  header: "状态",
+      headCell: () => (
+        <div className='w-full flex justify-between items-center'>
+          <span>状态</span>
+          <img src="/FilterFilled.svg" alt="" />
+        </div>
+      ),
+      cell: (row:Node) => (
+        <div className={cn("w-10 h-[22px]  border  rounded-sm text-xs  flex justify-center items-center",row.status?" border-[#B7EB8F] text-[#52C41A] bg-[##F6FFED]":"bg-[#FFF1F0] border-[#FFA39E] text-[#F5222D]") }>{row.status?"启用":"停用" }</div>
+      )
+    },
+    {
+      key: "url",  header: "地址",
+        headCell: () => (
+            <div className="w-full  flex items-center justify-between ">
+              <div>地址</div>
+              <Search width={12} height={12} className="text-[rgba(0,0,0,0.25)]" />
+            </div>
+          )
+    },
+      {
+        key: "total_traffic_count", header: "总流量数",
+        headCell: () => (
+          <div className='w-full flex justify-between items-center'>
+            <span>总流量数</span>
+            <img src="/Sort.svg" alt="" />
+          </div>
+        ),
+    },
+  
+  
+    { key: "average_upstream_traffic", header: "上行流量(30min)" },
+    { key: "created_at", header: "创建时间", cell: (row: Node) => (<span>{ formatDate(row.created_at)}</span> )   },
+    {
+      key: "id",
+      header: "操作",
+      cell: (row: Node) => ( 
+        <div className='flex gap-2'>
+          <div className="cursor-pointer text-[#007AFF]" onClick={() => toModalPage(row)} >编辑</div>
+          <div className="cursor-pointer text-red-700" onClick={()=> onDeleteTips(row)} >删除</div>
+        </div>
+        
+     ) 
+    },
+  ]
+  const toModalPage = (row: Node)=>{ 
+    sessionStorage.setItem(`node-${row.id}`, JSON.stringify(row))
+    router.push(`/admin/nodes/modal/${row.id}`)
+  }
+  const onDeleteTips =  (row:Node) => { 
+    setOpen(true)
+    setDeleteNodeRow(row)
+  }
+  const onDeleteNode = async () => { 
+    try {
+      if (!deleteNodeRow) { 
+        toast.error("删除失败")
+        return
+      }
+      const res = await deleteNode<Omit<NodeListApi,"data">>(deleteNodeRow.id)
+      if (res.code === 200) { 
+        getData()
+        toast.success("删除成功")
+        setOpen(false)
+        setDeleteNodeRow(null)
+      }
+    } catch (err: any) { 
+      toast.error(`删除失败:${JSON.stringify(err)}`)
+      console.error(err)
+    }
+  }
+  const getData = async (newPage?: PageType) => { 
+    try {
+      setLoading(true)
+      const res = await getNodesList<NodeListApi>({ ...page, ...newPage })
+      if (res.code === 200) {
+        setData(res.data.nodes)
+        setTotal(res.data.meta.total)
+        setPage({
+          ...page,
+          ...newPage,
+          last_page: res.data.meta.last_page,
+        })
+      }
+    } catch (e: any) {
+      console.error(e);
+    } finally { 
+      setLoading(false)
+    }
+  }
+  const onChange = (current_page: number) => {
+    const newPage = { ...page, page:current_page }
+    setPage(newPage)
+    getData(newPage)
+  }
+  useEffect(() => { 
+    getData()
+    bus.on("updateNodes", () => {
+      getData()
+    })
+    return () => {
+      bus.off("updateNodes")
+    }
+  },[])
+  return (
+    <div>
+      <XwyaTable<Node> data={data} columns={columns} loading={loading} total={total} page={page} onChange={onChange} />
+      <AlertDialog open={ open} onOpenChange={setOpen}  >
+      <AlertDialogTrigger asChild>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="lg:w-[412px]">
+        <AlertDialogHeader>
+            <AlertDialogTitle>确定删除节点：{deleteNodeRow && deleteNodeRow.name} ？</AlertDialogTitle>
+          <AlertDialogDescription>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="w-15 h-8">取消</AlertDialogCancel>
+          <AlertDialogAction className="bg-[#FF3B30] hover:bg-[#FF3B30] text-white w-15 h-8" onClick={onDeleteNode} >移除</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     </div>
-  );
+  )
 }
+
+export default Nodes
