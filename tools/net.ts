@@ -113,7 +113,8 @@ instance.interceptors.response.use(
           console.error('服务器错误');
           break;
         default:
-          console.error(`其他错误：${error.response.status}`);
+          // console.error(`其他错误：${error.response.status}`);
+          break;
       }
       if (error.response?.data?.code === 401) {
         if (isClient) {

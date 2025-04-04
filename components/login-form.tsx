@@ -35,12 +35,14 @@ export function LoginForm({
         if (code === 200) {
           refreshInstance.setToken(data.token);
           setUser(data.user);
-          window.location.href = '/';
           toast.success(message);
+          window.location.href = '/';
         }
       })
       .catch((error) => {
-        console.error(error);
+        if (error.message) {
+          toast.error(error.message)
+        }
       })
       .finally(() => {
         setIsLoading(false);
